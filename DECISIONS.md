@@ -398,7 +398,7 @@ Todos os itens marcados "provável" ainda precisam ser confirmados na documenta�
 - Consequência: os perfis antigos são portados como estão e validados pelos golden files (E-13/E-19). O restante do D-030 (casos especiais, categorias, limites) continua valendo.
 
 ### D-049 — Aparelhos de teste: só o OPPO (Android) → plano de testes degradado
-- Data: 28/10/2026 · Status: **proposta** (muda critérios do D-012 e o D-040: precisa do OK do Kaynan)
+- Data: 28/10/2026 · Status: **aceita com ajuste** (Kaynan, 28/10: "não tenho ninguém para testar com o iPhone, deixe para depois")
 - Fato: o único aparelho de teste é o **OPPO CPH2699** (Android 16, ColorOS 16). Não há iPhone, nem Mac (sem simulador de iOS), nem Android de outro fabricante.
 - Proposta:
   1. **Web/iPhone no dia a dia:** Playwright com **WebKit** (motor do Safari, no Windows) + Chrome desktop + Chrome do OPPO como aproximação. Cobre lógica, OPFS/SharedArrayBuffer, SW e headers, mas **não** substitui o Safari do iOS (instalação na Tela de Início, despejo de dados, `persist()`, Web Share no modo instalado, `.ics` no Calendário, VoiceOver).
@@ -409,9 +409,10 @@ Todos os itens marcados "provável" ainda precisam ser confirmados na documenta�
   6. **Se nenhuma janela de iPhone acontecer:** o iPhone entra no beta como **experimental**, com o roteiro de validação executado pelo próprio amigo e backup semanal reforçado.
 - Mudança no D-012 (a confirmar): "lembretes em 2 fabricantes" → OPPO antes do beta + 2º fabricante durante o beta; "iPhone validado no PWA" → validado nas janelas J-1..J-3 (ou no beta, como experimental).
 - Descartadas: nuvem de aparelhos reais (custo/termos; D-043 custo zero); adiar o iPhone para depois do MVP (contraria D-005/D-009).
+- **Ajuste aceito (28/10/2026):** não há iPhone emprestado. As janelas J-1..J-3 ficam **sem data** ("quando houver um iPhone"); a fila `docs/testes/fila-iphone.md` continua sendo alimentada. Até lá, o PWA do iPhone é **construído e testado no WebKit**, mas **não validado**: entra no beta como **experimental** (aviso no onboarding do iPhone e backup semanal). Critérios do D-012 ajustados: "lembretes em 2 fabricantes" → OPPO antes do beta + 2º fabricante nas 2 primeiras semanas do beta; "iPhone validado no PWA" e "backup Android ↔ iPhone" → **adiados** até haver iPhone (o backup cruzado é validado OPPO ↔ web no Chrome/WebKit antes do beta). Decisões do web que dependem de medição (E-02) ficam provisórias até a 1ª janela.
 
 ### D-050 — Lançamento manual de transação (novo PBI C-08)
-- Data: 28/10/2026 · Status: **proposta** (escopo novo: precisa do OK do Kaynan)
+- Data: 28/10/2026 · Status: **aceita** (Kaynan, 28/10: "incluir o lançamento manual")
 - Contexto: o código antigo tem `transactions/manual.ts` + tela, fora do backlog. O Kaynan pediu para avaliar.
 - Avaliação: **vale a pena**, como PBI pequeno e cortável.
   - A favor: (1) gasto em **dinheiro vivo** e Pix/débito de bancos sem CSV ficam fora do dashboard sem ele; (2) **familiares mais velhos** (D-009) podem nunca exportar um CSV: o lançamento manual é a porta de entrada mais simples e apoia o critério "usam sem ajuda" (D-012); (3) fecha o ciclo de "Paguei" (A-01) e de "encerrar compra" (L-04) quando o pagamento foi em dinheiro; (4) o código antigo já existe, bem desenhado (hash próprio que não colide com o dedupe do CSV, usa o mesmo motor de categorização, pode pagar uma conta na mesma transação SQL).

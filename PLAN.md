@@ -1,6 +1,6 @@
 # PLAN.md — Plano de etapas · Casa em Dia
 
-> Versão 1.2 · 28/10/2026 · Fase 3 (Codificação), passo "Divisão em Etapas". v1.1: código antigo → porte com triagem (D-045). v1.2: bancos (D-048), curva do PIN (D-029), só OPPO para testes (D-049, proposta), lançamento manual (D-050, proposta), Assinaturas não versionadas no inventário. **Aguardando aprovação do Kaynan.**
+> Versão 1.2 · 28/10/2026 · Fase 3 (Codificação), passo "Divisão em Etapas". v1.1: código antigo → porte com triagem (D-045). v1.3 (aprovada com "Start"): iPhone adiado (D-049 aceita com ajuste), C-08 incluído (D-050). v1.2: bancos (D-048), curva do PIN (D-029), só OPPO para testes (D-049, proposta), lançamento manual (D-050, proposta), Assinaturas não versionadas no inventário. **Aprovado pelo Kaynan em 28/10/2026.**
 > Fontes: `docs/backlog-local-first.pdf` (escopo funcional), `BRD.md` §4–5 (escopo vigente, D-044/D-045), `TRD.md`, `UX.md`, `ARCH.md`, `DECISIONS.md` (ADR-001..008, D-001..D-045), código antigo `dia-a-dia` (§0.4), `docs/matriz-paridade.md`, skills `backlog-pbi`, `git-versionamento`, `testing-strategy`.
 > Regra: **uma etapa por vez**; só avança com testes verdes + aprovação. Cada etapa = 1 sessão de 1–3 h (com até 5 h/semana, D-043, ≈ 2 etapas/semana).
 
@@ -19,7 +19,7 @@
 - **Portões automáticos:** `npx tsc --noEmit`, `npm test` (inclui o **teste de fronteira de imports** da E-01), `npx expo-doctor`, `npx expo export -p web` + "sem URL externa no `dist/`" (script da E-01). Na E-06 tudo isso vira CI (GitHub Actions), que roda quando o Kaynan fizer push.
 - **Autoteste no aparelho** (proposto na E-03): rota `/dev/selftest`, só presente em builds de debug e de preview (`EXPO_PUBLIC_SELFTEST=1`), que roda as suítes de contrato/golden **nos adaptadores reais** com banco **separado e sintético**. Android: `scripts/selftest-android.ps1` (deep link + `adb logcat`); web: Playwright. A CI verifica que o build de **produção** não contém a rota.
 - **A11y:** checklist `UX.md` §9.2 (14 itens) + skill `a11y-expo` em toda tela nova; roteiro manual **TalkBack no OPPO** e **VoiceOver no iPhone (PWA)**.
-- **Sem iPhone (D-049, proposta):** o único aparelho é o OPPO. Todo item "iPhone real" de uma etapa é verificado agora no **Playwright WebKit** (e no Chrome do OPPO quando fizer sentido) e entra em `docs/testes/fila-iphone.md` para a próxima **janela de iPhone emprestado** (J-1..J-3, §1.1). A etapa fecha com o item marcado "pendente de iPhone", nunca como "testado".
+- **Sem iPhone (D-049, aceita com ajuste):** o único aparelho é o OPPO e não há iPhone emprestado. Todo item "iPhone real" de uma etapa é verificado no **Playwright WebKit** (e no Chrome do OPPO quando fizer sentido) e entra em `docs/testes/fila-iphone.md`. A etapa fecha com o item marcado "pendente de iPhone", nunca como "testado". O PWA do iPhone vai ao beta como **experimental** enquanto a fila não for executada.
 - **Segurança:** skill `security-review` quando tocar dados/arquivos/logs/auth/headers; nunca dado real; valores em centavos; contas `****1234`.
 - **Paridade:** linha atualizada em `docs/matriz-paridade.md` no mesmo commit; "?" resolvido vira fato com fonte e data.
 - **Demonstração:** APK de debug (`arm64-v8a`) instalado no OPPO + preview `https://<branch>.casa-em-dia-44l.pages.dev` (deploy de preview **só depois de avisar**; produção **só com comando explícito**).
@@ -88,12 +88,12 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 | **M-0** Velocidade | Fim da E-11 | Medir horas reais por etapa (Sprints 0–2) e propor a data do beta | Data proposta registrada em `DECISIONS.md` (revisão de D-043) |
 | **M-1a** Lembretes Android 14 dias | Começa no fim da E-23; OPPO antes do beta; 2º fabricante nas 2 primeiras semanas do beta (D-049) | OPPO (ColorOS 16): app fechado, reboot, economia de bateria, restauração de backup; depois um amigo Android de outro fabricante, com roteiro | 100% no horário (± tolerância do modo inexato); resultados em `docs/testes/` |
 | **M-1b** Estratégia de alertas do iPhone | E-22/E-24 no WebKit; validação real na **J-2** | `.ics` importado no Calendário do iOS, com `VALARM` tocando; faixa ao abrir; badge (se houver) | Alarme toca; reexportar não duplica (ou degradação documentada) |
-| **M-2** Backup cruzado | Prévia na E-05 (OPPO ↔ web no Chrome/WebKit); completo na **J-3** (E-40) | Backup OPPO → PWA no iPhone e o inverso, com dados de todos os módulos | Restauração equivalente (contagens + somas iguais) nos dois sentidos, **antes do beta** |
+| **M-2** Backup cruzado | Prévia na E-05; completo na E-40 | Backup OPPO → web (Chrome/WebKit) e o inverso, com dados de todos os módulos; **iPhone real adiado** (D-049) | Restauração equivalente (contagens + somas iguais) nos dois sentidos, **antes do beta** |
 | **M-3** PWA offline e atualização | E-07 no WebKit/Chrome; real na **J-1**; revalidado na **J-3** | iPhone: instalar, modo avião, reabrir após dias, deploy A → B com faixa "Nova versão" | Abre em modo avião; dados persistem; atualização só com toque do usuário |
 | **M-4** Beta 30 dias | Depois da E-40 | Amigos usando sem ajuda (D-012) | Critérios D-012 + BRD §3.2 |
-| **J-1** Janela iPhone 1 | Logo depois da E-07 | Instalação, offline, OPFS/`persist()`, confirmação da medição da E-02, itens da fila | Fila zerada até a E-07 |
-| **J-2** Janela iPhone 2 | Logo depois da E-24 | `.ics` com alarme (M-1b), faixa, badge, Web Share no modo instalado, itens da fila | Fila zerada até a E-24 |
-| **J-3** Janela iPhone 3 | Na E-40 | M-2, M-3, VoiceOver nas telas principais, itens da fila | Fila zerada; sem J-3 → iPhone "experimental" no beta (D-049) |
+| **J-1** Janela iPhone 1 | **Sem data** — quando houver um iPhone (D-049) | Instalação, offline, OPFS/`persist()`, confirmação da medição da E-02, itens da fila | Fila zerada até a E-07 |
+| **J-2** Janela iPhone 2 | **Sem data** — quando houver um iPhone (D-049) | `.ics` com alarme (M-1b), faixa, badge, Web Share no modo instalado, itens da fila | Fila zerada até a E-24 |
+| **J-3** Janela iPhone 3 | **Sem data** — quando houver um iPhone (D-049) | M-2, M-3, VoiceOver nas telas principais, itens da fila | Fila zerada; sem J-3 → iPhone "experimental" no beta (D-049) |
 
 ---
 
@@ -259,7 +259,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 ### E-08 — Onboarding em 4 passos, ajuda e avisos de backup
 - **Sprint:** 2 · **PBIs:** F-08, F-06 (lembrete no iPhone e "há N dias"), F-04 (texto curto de privacidade na 1ª abertura).
 - **Objetivo:** uma pessoa sem ajuda instala, cria o PIN, entende o backup e escolhe o primeiro passo.
-- **Escopo:** passos 1–4 do D-023 (boas-vindas + privacidade, criar PIN (reusa E-04) + biometria, backup: risco + lembrete, primeiro passo); aviso "PIN esquecido não tem recuperação"; Início com "💾 Backup: há N dias" (âmbar > 30 dias Android / > 7 dias iPhone); lembrete **semanal dentro do app** no iPhone (faixa); tela **Sobre/ajuda**: instalar o APK (Android) e "Adicionar à Tela de Início" (iPhone); texto de privacidade (UX §8).
+- **Escopo:** passos 1–4 do D-023 (boas-vindas + privacidade, criar PIN (reusa E-04) + biometria, backup: risco + lembrete, primeiro passo); aviso "PIN esquecido não tem recuperação"; Início com "💾 Backup: há N dias" (âmbar > 30 dias Android / > 7 dias iPhone); lembrete **semanal dentro do app** no iPhone (faixa); tela **Sobre/ajuda**: instalar o APK (Android) e "Adicionar à Tela de Início" (iPhone); texto de privacidade (UX §8); no iPhone, aviso de que a versão é **experimental** (D-049).
 - **Fora de escopo:** lembrete mensal por notificação no Android (E-23, precisa da porta `notifications`); ajuda de exportar CSV por banco (E-12/E-19).
 - **Dependências:** E-04, E-05, E-07.
 - **Plataformas:** Android = 4 passos, biometria, lembrete mensal configurado (disparo na E-23) · iPhone/PWA = passo 0 (E-07) + 4 passos, só PIN, lembrete semanal no app (≈).
@@ -428,8 +428,8 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 
 ## 7. Sprint 5 — Contas
 
-### E-17b — Lançamento manual de transação (**proposta**, D-050)
-- **Sprint:** 4 · **PBIs:** C-08 (novo, Should, **aguarda OK**).
+### E-17b — Lançamento manual de transação (D-050)
+- **Sprint:** 4 · **PBIs:** C-08 (novo, Should, aceito em 28/10/2026).
 - **Objetivo:** registrar à mão um gasto ou receita (dinheiro vivo, banco sem CSV), sem contar 2× quando o extrato chegar.
 - **Porte (D-045):** `transactions/manual.ts` (hash próprio que não colide com o dedupe do CSV, mesmo motor de categorização, pagar conta na mesma transação SQL) + tela `transactions/manual` como referência.
 - **Escopo:** tela "Novo lançamento" (valor em centavos, entrada/saída, data, descrição, categoria automática ou escolhida, conta; padrão **Carteira (dinheiro)**); aviso ao lançar numa conta que recebe CSV; na importação, sugestão "Já lançado à mão? [Juntar]" para mesma conta + mesmo valor + data ±3 dias, com confirmação; origem "manual" visível na lista.
@@ -440,7 +440,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 - **Testes:** U (validação, sugestão de junção) · I · E · M: formulário com TalkBack ⓜ.
 - **Demonstração:** APK/URL: Gastos → "+ Lançamento" → "Feira R$ 45,00 (Carteira)" aparece em Mercado.
 - **Riscos / plano B:** o usuário lança e importa o mesmo gasto → sugestão de junção + conta Carteira como padrão.
-- **Status:** [ ] proposta (aguarda OK do Kaynan)
+- **Status:** [ ] pendente
 
 ### E-20 — Contas a pagar: recorrência e instâncias (core + banco)
 - **Sprint:** 5 · **PBIs:** A-01. D-031.
@@ -708,7 +708,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 | C-04 Categorização | Must | E-16, E-19 (meta 70%) | ✔ |
 | C-05 Correção | Must | E-17 | ✔ |
 | C-06 Dashboard | Must | E-18 | ✔ |
-| C-08 Lançamento manual (**proposto**) | Should | E-17b | se aprovado |
+| C-08 Lançamento manual | Should | E-17b | ✔ |
 | A-01 Contas | Must | E-20, E-21 | ✔ |
 | A-03 Confiabilidade | Must | E-22 | ✔ |
 | A-04 Motor | Must | E-23, E-24 (iPhone), E-40 (M-1a) | ✔ |
@@ -757,7 +757,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 | Ordem | Corte | Etapas afetadas |
 |---|---|---|
 | 1 | L-05 Histórico/comparativo | E-37 sai |
-| 1b | C-08 Lançamento manual (se aprovado) | E-17b sai |
+| 1b | C-08 Lançamento manual | E-17b sai |
 | 2 | A-05 Ações rápidas | E-25 sai (ações ficam na faixa/lista) |
 | 3 | L-03 só a câmera/EAN | E-33 sai (EAN digitado continua na E-32) |
 | 4 | S-02 Detecção | E-29 sai |
@@ -768,7 +768,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 | 8 | S-01/S-03/S-04 | E-26..E-28 saem |
 
 ## 16. Status
-Todas as etapas: **[ ] pendente**. Próxima: **E-01**, aguardando "Start" (3B).
+Plano aprovado em 28/10/2026 ("Start"). **E-01 em andamento.** Demais etapas: [ ] pendente.
 
 ## 17. Perguntas em aberto (impedem alguma etapa)
 | # | Pergunta | Bloqueia |
@@ -776,7 +776,7 @@ Todas as etapas: **[ ] pendente**. Próxima: **E-01**, aguardando "Start" (3B).
 | ~~1~~ | ~~Porte × reescrita da E-06~~ → **resolvida**: porte com triagem (D-045). | — |
 | 2 | Se você ainda tiver o backlog de 14/10 (critérios de C-01..C-06), ele ajuda; sem ele, o contrato é BRD §5.2 + backlog + comportamento do código antigo. **Não bloqueia mais.** | — |
 | ~~3~~ | ~~Bancos~~ → **resolvida** (D-048): Nubank, Itaú, Bradesco, BB, Caixa, Inter. Ainda preciso dos CSVs anonimizados de cada um (você roda o script da E-12). | E-12, E-13, E-19 |
-| 4 | Sem iPhone (D-049, **proposta**): aprova as janelas J-1..J-3 com um iPhone emprestado e a mudança do critério de 2 fabricantes para o beta? Há alguém com iPhone para ~3 sessões de 30–45 min? | E-07 (J-1), M-1b, beta |
-| 5 | Aprova os desvios do §0.1: SW/offline no Sprint 2 (E-07), Playwright já na E-03, página de bancada descartável publicada em preview `spike/*` na E-02, rota de autoteste em builds de debug/preview? | E-02, E-03, E-07 |
-| 7 | Lançamento manual (C-08, D-050, **proposta**): inclui no MVP como Should (E-17b)? | E-17b |
+| ~~4~~ | ~~iPhone~~ → **resolvida**: sem iPhone; validação adiada, PWA experimental no beta (D-049). | — |
+| ~~5~~ | ~~Desvios do §0.1~~ → **aprovados** com o "Start" (28/10/2026). | — |
+| ~~7~~ | ~~Lançamento manual~~ → **incluído** (C-08, D-050). | — |
 | ~~6~~ | ~~Curva da espera do PIN~~ → **resolvida** (D-029). | — |

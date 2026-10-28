@@ -26,7 +26,7 @@ Beta com 3–5 pessoas, **maioria Android**, perfil misto. Sem conta: cada pesso
 - ≥ **70%** das transações categorizadas sem intervenção.
 - Lembretes disparando no horário em teste de **14 dias** em **≥ 2 fabricantes Android**.
 - Backup restaurado em outro aparelho, **incluindo Android ↔ iPhone** (D-008).
-- **iPhone validado no PWA**: instalação, uso offline, faixa de avisos e `.ics`.
+- **iPhone validado no PWA**: instalação, uso offline, faixa de avisos e `.ics`. **Adiado até haver um iPhone (D-049)**: no beta o iPhone é experimental; antes do beta, valida-se no WebKit.
 - Metas de desempenho do TRD §6 atendidas (D-041).
 - Checklist de acessibilidade aprovado em todas as telas (D-027).
 
@@ -67,6 +67,7 @@ Legenda de situação: **Novo** · **Refazer/Adaptar** (backlog) · **Portar** (
 | L-04 | Registro de preço ao concluir a compra | Must | A fazer | Item a item (D-033) |
 | L-05 | Histórico e comparativo de preços | Should | A fazer | 1º na ordem de corte |
 | L-08 | Importar lista de CSV e mesclar | Must | A fazer | |
+| C-08 | **Lançamento manual de transação** (novo, D-050) | Should | Portar | Carteira (dinheiro) como conta padrão; sugestão de junção com o extrato |
 
 ### 4.2 R2
 A-02 (recorrentes no CSV) · C-07 (modelo leve no aparelho) · S-05 (alerta de reajuste) · **X-01 Orçamento por categoria** (D-034) · **Passkey/Face ID no iPhone**, se aprovada no E-02 (D-003) · **Feriados nacionais** no "dia útil" (D-031) · cotação online opcional (reavaliar, D-032).
@@ -76,7 +77,7 @@ L-07 (cupom NFC-e; só Android) · **X-02 Metas de economia** · **X-03 Divisão
 
 ### 4.4 Ordem de corte do MVP (D-013)
 Nunca cortar: F-01, F-03, F-04, F-06, F-07, **F-08**, C-01..C-06, A-01, A-03, A-04.
-Cortar nesta ordem: 1. L-05 · 2. A-05 · 3. câmera do L-03 · 4. S-02 · 5. F-05 (mínimo) · 6. L-04 · 7. L-02/L-08 · 7b. L-01 (só com o módulo Compras inteiro) · 8. S-01/S-03/S-04.
+Cortar nesta ordem: 1. L-05 · 1b. C-08 · 2. A-05 · 3. câmera do L-03 · 4. S-02 · 5. F-05 (mínimo) · 6. L-04 · 7. L-02/L-08 · 7b. L-01 (só com o módulo Compras inteiro) · 8. S-01/S-03/S-04.
 
 ### 4.5 Plano de sprints (referência; substitui o do backlog)
 Um "sprint" aqui é uma **unidade de escopo**, não 2 semanas: com até 5 h/semana (D-043), cada um deve levar várias semanas. A data do beta é estimada após o Sprint 1.

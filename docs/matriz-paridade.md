@@ -4,6 +4,8 @@
 > Regra (AGENTS.md §5, D-005): toda feature declara o comportamento nas duas plataformas; capacidade ausente = **degradação explícita**.
 > Android = app nativo (APK). iPhone = PWA instalado na Tela de Início (Safari, iOS 18/26). "Testar" = depende de verificação em aparelho real.
 
+> **Aviso (D-049, 28/10/2026):** não há iPhone para teste. Tudo que diz "iPhone" abaixo é o comportamento **projetado** e testado no WebKit (Playwright); a validação em iPhone real está adiada. Itens "?" que dependem do Safari do iOS ficam abertos até lá.
+
 ## Legenda
 **=** igual · **≈** degradado (limitação descrita) · **✕** ausente (alternativa descrita) · **?** a verificar
 
@@ -20,6 +22,7 @@
 | F-08 Onboarding e ajuda | 4 passos; PIN + biometria; lembrete de backup mensal; ajuda para instalar o APK | Passo 0 "Instalar na Tela de Início" (bloqueia até instalar); PIN; backup semanal | ≈ | D-002, D-023, D-044 |
 | C-01 Importar CSV | Seletor do sistema + "Abrir com"; parsing em fatias (sem Web Worker); notificação ao concluir em 2º plano | Só seletor dentro do app; parsing em Web Worker; sem aviso em 2º plano (a tela mostra o progresso) | ≈ | Limite 10 MB / 50 mil linhas: medir memória no iPhone |
 | C-02..C-05 Perfis, dedupe, regras, correção | Core | Core | = | Perfis novos: APK novo × deploy; 6 bancos (D-030) |
+| C-08 Lançamento manual (D-050) | Core + banco | Core + banco | = | Conta "Carteira (dinheiro)" padrão; sugestão de junção na importação |
 | C-06 Dashboard | SQL no SQLite nativo | SQL no SQLite WASM | = ? | Meta < 2 s com ~10 mil transações nos dois |
 | A-01 Contas e recorrência | Core + banco | Core + banco | = | — |
 | A-03 Permissões/confiabilidade | Permissões, alarmes exatos, bateria por fabricante, canais, tela "Meus alertas…" | ✕ Sem notificações: a tela explica o modelo do iPhone (avisos no app + `.ics`) e mostra a data do último `.ics` exportado | ✕ | D-001 |
