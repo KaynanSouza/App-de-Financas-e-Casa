@@ -34,7 +34,7 @@ Servidor de dados, login/conta/2FA, lar e convites, sincronização, Web Push/se
 8. **Acessível por requisito:** TalkBack/VoiceOver, fonte 200%, AA, nunca só cor, alvos ≥ 48 (D-027).
 
 ## Estado atual
-Fase 2 (Descoberta) concluída. Próximo: **Fase 3 (Prompt 3A)**, incluindo o spike **E-02** (criptografia web, KDF, passkey, `.ics`, câmera web, `Intl` no Hermes).
+Fase 3 (Codificação): `PLAN.md` com 40 etapas aguardando aprovação. Próxima: **E-01** (esqueleto + pipeline); depois o spike **E-02** (criptografia web + KDF).
 
 ## Documentos
-`AGENTS.md` (regras) · `/skills` · `ARCH.md` · `SESSION.md` · `BRD.md` · `TRD.md` · `UX.md` · `DECISIONS.md` · `docs/matriz-paridade.md` · `docs/backlog-local-first.pdf` · `docs/PROVA-DE-VIDA.md` · `docs/DEPLOY-CLOUDFLARE.md` · `docs/ASSINATURA.md`.
+`AGENTS.md` (regras) · `/skills` · `ARCH.md` · `PLAN.md` · `SESSION.md` · `BRD.md` · `TRD.md` · `UX.md` · `DECISIONS.md` · `docs/matriz-paridade.md` · `docs/backlog-local-first.pdf` · `docs/PROVA-DE-VIDA.md` · `docs/DEPLOY-CLOUDFLARE.md` · `docs/ASSINATURA.md`.

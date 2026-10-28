@@ -45,6 +45,8 @@ Transformar um PBI do backlog em tarefas pequenas e verificáveis, sem inventar 
 - [ ] **Aprovação do Kaynan** antes de avançar.
 
 ## Armadilhas
+- Antes de iniciar uma etapa, ler o bloco dela no `PLAN.md` (escopo, dependências, critérios, testes, demonstração) e as perguntas abertas do §17; a etapa só começa com o "Start" do Kaynan.
+- Os critérios de aceite de C-01..C-06 não estão no backlog atual ("continuam válidos" do backlog de 14/10, ausente no repo): usar BRD §5.2 até o Kaynan responder (PLAN §17).
 - Tratar a nota técnica do backlog como instrução literal (ex.: "Web Worker" no nativo, "plugin do Capacitor").
 - Esquecer as dependências críticas: F-07/F-03 bloqueiam tudo; C-03 bloqueia S-02/A-02/L-04; os UUIDs de L-01 precisam existir desde o início.
 - Fazer dois PBIs de uma vez.
