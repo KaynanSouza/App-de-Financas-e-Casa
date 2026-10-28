@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "App de Finanças e Casa",
-    "slug": "app-financas-casa",
+    "name": "Casa em Dia",
+    "slug": "casa-em-dia",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "appfinancascasa",
+    "scheme": "casaemdia",
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon"

@@ -26,13 +26,13 @@
 - Decisão: development build no SDK 58, gerado **localmente** (`expo prebuild` + Gradle). EAS na nuvem fica como plano B. O `eas build --local` não suporta Windows.
 - Consequência: exige o CMake ≥ 4.1.2 no SDK e `cmake.dir` configurado (MAX_PATH; ver `docs/PROVA-DE-VIDA.md` §7). Isso precisa virar configuração reproduzível.
 
-### ADR-005 — `android.package` provisório
-- Data: 28/10/2026 · Status: **proposta (pendente de confirmação)**
-- Decisão provisória: `com.kaynansouza.financasecasa`, exigido pelo `prebuild`.
-- Pendente: confirmar antes da primeira distribuição. O package e a chave de assinatura formam a identidade do app; trocar depois obriga a reinstalar.
+### ADR-005 — Nome comercial e identidade do app
+- Data: 28/10/2026 · Status: aceita (pelo Kaynan)
+- Decisão: nome comercial **"Casa em Dia"** (`expo.name`), `slug` `casa-em-dia`, `scheme` `casaemdia`. O `android.package` continua **neutro**: `com.kaynansouza.financasecasa` (recomendação aceita: o nome pode mudar, o package não).
+- Consequência: o package e a chave de assinatura formam a identidade do app; trocar depois da primeira distribuição obriga a reinstalar.
 
 ### ADR-006 — Deploy do PWA por Direct Upload (wrangler)
-- Data: 28/10/2026 · Status: **proposta (recomendação do agente)**
+- Data: 28/10/2026 · Status: aceita (pelo Kaynan)
 - Decisão proposta: Cloudflare Pages via `wrangler pages deploy` (sem integração Git). Nada publica sem comando explícito, e o build é local.
 - Consequência: um projeto Direct Upload não migra para a integração Git depois.
 
@@ -42,8 +42,8 @@
 - Decisão: `public/_redirects` sem regras; nunca gerar `404.html` sem rever esse comportamento.
 
 ### ADR-008 — Runner de testes
-- Data: 28/10/2026 · Status: **proposta (pendente de aprovação para instalar)**
-- Proposta: `jest-expo` (Jest 30) como runner único, que é o único documentado pelo Expo SDK 58. Playwright para o e2e web, numa etapa posterior.
+- Data: 28/10/2026 · Status: aceita e instalada (`jest-expo` ~58.0.12, `jest` ~30.5.2, `@types/jest` 30.0.0; licenças MIT; só dev). Comando: `npm test`.
+- Decisão: `jest-expo` (Jest 30) como runner único, que é o único documentado pelo Expo SDK 58. Playwright para o e2e web, numa etapa posterior.
 
 ## Pontos do backlog que a nova arquitetura invalida ou muda (NÃO resolvidos)
 
