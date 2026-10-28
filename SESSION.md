@@ -3,36 +3,33 @@
 **Atualizado em:** 28/10/2026
 
 ## Fase atual
-**Fase 1 concluída. Próximo passo: Fase 2 — Descoberta (Prompt 2).**
+**Fase 2 concluída. Próximo: Prompt 3A.**
 
 ## Última ação
-- Etapas "Setup das Skills" e "Gestão das Skills": 13 skills em `/skills` (+ `skills/README.md` com índice e regras de gestão); `AGENTS.md` referencia `/skills`.
-- Fase 1, em resumo (detalhes em `docs/PROVA-DE-VIDA.md`):
-  - Estrutura Expo SDK 58; ambiente verificado (Node 24.16.0, JDK 17, Android SDK, **CMake 4.1.2**, `expo-doctor` 20/20, wrangler 4.154.0).
-  - APK de debug no **OPPO CPH2699 (Android 16)** com SQLite nativo OK; SQLite web (OPFS) OK.
-  - Preview publicado: https://preview.casa-em-dia-44l.pages.dev (projeto Pages clássico `casa-em-dia`, criado com `--force`). Teste manual do Kaynan: "está tudo correto". Produção NÃO publicada.
-  - Nome comercial **Casa em Dia** (package neutro `com.kaynansouza.financasecasa`); `jest-expo` instalado.
+- Fase 2 (Descoberta): entrevista dos Blocos 0, A–G com o Kaynan → **D-001..D-044** em `DECISIONS.md` (com índice e status dos 24 pontos de impacto da arquitetura).
+- Gerados/atualizados: `BRD.md` (personas, métricas, escopo por release, ordem de corte, plano de sprints, regras por módulo, riscos), `TRD.md` (stack, arquitetura, portas, modelo de dados, STRIDE, alertas, desempenho, testes, builds, deploy/CSP/SW, versionamento), `UX.md` (42 telas, wireframes, design system com contraste calculado, microcopy, checklist de acessibilidade), `docs/matriz-paridade.md` FINAL, `CONTEXT.md`, `ARCH.md`.
+- Checagem de consistência: todos os PBIs do MVP no BRD, TRD, UX/matriz; as 42 telas mapeadas a PBIs; lacuna encontrada (onboarding/ajuda sem PBI) → **novo PBI F-08** (D-044).
+- Lições registradas nas skills (alerts, sqlite-web, backup, csv, a11y, backlog-pbi, pwa).
+
+## Decisões que mais mudam o plano
+- **C-01..C-06 serão reescritos** (o código dos Épicos 1 e 2 não existe mais; D-036). Escopo mantido, prazo maior.
+- **iPhone:** sem notificações → faixa no app + `.ics` (D-001); instalação obrigatória + backup semanal (D-002).
+- **Zero rede no MVP** (D-032); **custo zero** e **até 5 h/semana** (D-043): data do beta só após o Sprint 1.
 
 ## Próximo passo
-Fase 2 — Descoberta (Prompt 2): o Kaynan informa o local do código dos Épicos 1 e 2 (F-07); preencher BRD/TRD/UX/DECISIONS.
+Prompt 3A (Fase 3). O spike **E-02** precisa responder: criptografia do banco no web, KDF (backup/PIN), passkey PRF, `VALARM` do `.ics` no iOS, `expo-camera` web no Safari, `Intl` com fuso no Hermes, Web Share no modo standalone, Badging API.
 
 ## Bloqueios
 - Nenhum.
 
-## Decisões pendentes (levar para a Descoberta)
-1. **Criptografia do banco no PWA** (SQLCipher não existe no web; OPFS com `persisted() = false`): spike entre criptografia por campo, snapshot cifrado ou VFS cifrado (skill `sqlite-web-encrypted`).
-2. **Alertas no iPhone** (sem notificação local no PWA): avisos dentro do app, exportação `.ics` ou ambos (skill `alerts-android-and-ios`). O `.ics` precisa de confirmação, porque o feed ICS saiu do escopo.
-3. **KDF do backup e do PIN:** PBKDF2 (WebCrypto) ou Argon2id (dependência) (skill `backup-cross-platform`).
-4. Antes da produção: Pages clássico ou migrar para Workers (ADR-006).
-5. iPhone/PWA no critério de saída do MVP; os 24 pontos de impacto (DECISIONS.md).
-6. Manifest e service worker do PWA; CSP restritiva.
-7. `allowBackup=false` (F-03); `cmake.dir` reproduzível, já que `android/` é gerado.
-8. Teste de fronteira (`src/core` sem react/expo; módulos nativos só em `src/platform`).
-9. Dependências extras do template e as 8 vulnerabilidades do `npm audit`.
-10. Idioma das mensagens de commit: o AGENTS.md diz inglês, mas os prompts ditam mensagens em português. Hoje vale a mensagem ditada; confirmar a regra.
-11. Local do código dos Épicos 1 e 2 (F-07).
+## Decisões provisórias / em aberto
+1. E-02 (Fase 3): D-004, D-033 (EAN no iPhone), D-038 (Intl/Hermes), D-039 (KDF), D-003 (passkey → R2).
+2. Feriados no "dia útil" → R2 (D-031). Data do beta → após o Sprint 1 (D-043).
+3. Antes da produção: Pages clássico × Workers (ADR-006).
+4. Sprint 1: `allowBackup=false` e `cmake.dir` reproduzível (config plugins); teste de fronteira de imports.
+5. Script local de anonimização de CSV + amostras dos 6 bancos (D-036).
+6. Idioma das mensagens de commit (AGENTS diz inglês; os prompts ditam português).
+7. Dependências extras do template e as 8 vulnerabilidades do `npm audit`.
 
 ## Não testado
-- OPFS / SharedArrayBuffer / `persist()` no **Safari do iOS** com banco (o preview atual não usa SQLite).
-- Build **release** assinado; SQLCipher; lembretes em aparelho real.
-- As skills foram escritas, mas nenhuma foi exercitada ainda numa tarefa real.
+- Nada de código de produto nesta fase. Afirmações sobre plataformas marcadas "?" na matriz dependem do E-02 e de aparelhos reais (iPhone 18 e 26, segundo fabricante Android).

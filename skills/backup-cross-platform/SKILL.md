@@ -29,7 +29,7 @@ ciphertext   AES-GCM( payload ), com AAD = magic+formatVer+header
 - Dinheiro em centavos inteiros; datas em ISO; ids UUID preservados.
 - Configurações incluídas; **chaves do banco e PIN NUNCA** entram no backup.
 
-## KDF — decisão pendente (TRD)
+## KDF — decisão no spike E-02 (D-039). Fato: `expo-crypto` (SDK 58) tem AES-GCM, random, UUID e digest em Android e web, mas **não** tem PBKDF2/HKDF/Argon2
 - **WebCrypto não tem Argon2id.** Opções: (a) PBKDF2-SHA-256 com muitas iterações (nativo nas duas plataformas, sem dependência); (b) Argon2id via WASM/lib nas duas plataformas (exige justificar a dependência). Verificar a documentação atual e as recomendações vigentes (OWASP) para os parâmetros.
 - Os parâmetros ficam no header: aumentar as iterações no futuro não quebra backups antigos.
 - No Android nativo é preciso uma implementação de AES-GCM/PBKDF2 compatível. Verificar a doc atual (WebCrypto no Hermes/Expo, ou uma lib), avisando antes de adicionar dependência.

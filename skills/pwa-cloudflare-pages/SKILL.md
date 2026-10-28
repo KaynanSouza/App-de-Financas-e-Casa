@@ -30,7 +30,7 @@ PWA instalável pelo Safari, que abre em **modo avião** após a primeira carga,
 - Manter: `Cross-Origin-Opener-Policy: same-origin`, `Cross-Origin-Embedder-Policy: credentialless` (expo-sqlite), `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, cache imutável em `/_expo/static/*`.
 - **CSP restritiva** (adicionar e testar no preview): `default-src 'self'; connect-src 'self'; img-src 'self' data: blob:; worker-src 'self' blob:; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'`. Verificar no preview o que o export do Expo exige (script inline? `unsafe-inline` de estilo do RN Web?). Ajustar com evidência, nunca afrouxar por chute.
 - `Permissions-Policy` desligando o que não é usado (câmera só quando L-03 existir).
-- A exceção opcional S-01 (cotação) exigiria um `connect-src` extra: decisão do Kaynan.
+- **Zero rede no MVP** (D-032): sem exceção no `connect-src`. `_headers` final proposto em `TRD.md` §9. Instalação na Tela de Início é obrigatória no iPhone (D-002).
 - `Cache-Control: no-cache` para `/sw.js` e `/manifest.webmanifest`.
 
 ## `_redirects`

@@ -27,7 +27,7 @@ Lembretes que **tocam no horário** no Android, mesmo com o app fechado e sem re
 ## Tela "Meus alertas estão funcionando?" (A-03)
 Checklist ao vivo: notificações permitidas, alarmes exatos, otimização de bateria, Não Perturbe, canais ativos, próximo alerta agendado, botão "notificação de teste em 1 minuto". Aviso na tela inicial se alguma permissão for revogada.
 
-## iPhone/PWA — estratégia **A DECIDIR na Descoberta**
+## iPhone/PWA — estratégia **DECIDIDA (D-001)**: faixa no app + badge (se suportado) + exportação `.ics`; Web Push descartado (exige servidor). Regras padrão (D-031): 3 dias, 1 dia e no dia, às 9h; silêncio 22h–7h; atraso 1×/dia por 3 dias; máx. 5/dia; só nome e data. Pendente no E-02: importação de `VALARM` no iOS 18/26.
 Fato (doc do WebKit): web apps da Tela de Início (iOS 16.4+) só notificam por **Web Push**, que passa pela Apple e **exige um servidor** enviando o push. **Não há notificação local agendada.** Um servidor de push contraria o local-first, então não usar sem decisão explícita do Kaynan.
 Candidatas (declarar a escolhida na matriz de paridade):
 1. **Avisos dentro do app:** ao abrir, uma faixa "vence hoje/amanhã/atrasadas" + badge (verificar o suporte da Badging API no iOS).

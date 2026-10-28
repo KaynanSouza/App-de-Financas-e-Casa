@@ -17,7 +17,7 @@ Dar ao PWA o mesmo modelo de dados do Android, persistente e protegido, sabendo 
 - `withExclusiveTransactionAsync()` e `directory` customizado **não** funcionam no web.
 - **Não testado:** Safari do iOS 18/26 (OPFS, SharedArrayBuffer, `persist()`).
 
-## Estratégia de criptografia — **A DECIDIR na Descoberta (spike pendente)**
+## Estratégia de criptografia — **A DECIDIR no spike E-02 (Fase 3; D-004)**. Já decidido: AES-256-GCM via `expo-crypto` (D-039); instalação obrigatória na Tela de Início + `persist()` + backup semanal (D-002); PIN de 6 dígitos com KDF e espera crescente (D-003/D-029)
 Nenhum spike foi feito. Candidatas a avaliar (verificar a documentação atual de cada uma):
 1. **Criptografia por campo/registro na aplicação** (AES-GCM via WebCrypto) antes de gravar no SQLite. Simples; o esquema e os índices ficam visíveis; não dá para indexar campos cifrados.
 2. **Banco em memória + snapshot cifrado:** exportar o banco serializado, cifrar com AES-GCM e gravar no OPFS. Protege tudo; custa memória e tempo de gravação (validar com cerca de 10 mil transações, meta C-06).

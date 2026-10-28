@@ -16,7 +16,7 @@ Transformar um PBI do backlog em tarefas pequenas e verificáveis, sem inventar 
 
 ## Passo a passo
 1. **Ler o PBI inteiro:** descrição, critérios de aceite, notas técnicas, dependências.
-2. **Reinterpretar:** onde o PBI citar Capacitor, plugin, WebView, IndexedDB proibido, Keystore ou notificação local, tratar como **intenção**; achar o item correspondente em `DECISIONS.md`.
+2. **Reinterpretar:** onde o PBI citar Capacitor, plugin, WebView, IndexedDB proibido, Keystore ou notificação local, tratar como **intenção**; achar o item correspondente em `DECISIONS.md`. Atenção: C-01..C-06 aparecem como "Concluído (portar)" no backlog, mas são **reescrita** (D-036); **F-08 Onboarding e ajuda** é PBI novo (D-044). O escopo vigente está no `BRD.md` §4.
 3. **Checar dependências** do PBI: estão prontas? Se não, parar e avisar.
 4. **Listar lacunas e contradições** e **perguntar** ao Kaynan antes de codar. Nunca preencher requisito por conta própria.
 5. **Declarar a paridade:** para cada critério, o comportamento no Android e no iPhone/PWA; se faltar capacidade, propor a degradação e **avisar**.
