@@ -11,21 +11,22 @@ FASE 1 — SETUP · etapa "Verificação do Ambiente" (Prompt 1B) — **concluí
 - Prova de vida:
   - **Web dev:** OK. **Export estático:** OK, servido com `wrangler pages dev`; SQLite no web OK (OPFS, precisa de COOP/COEP e de `.wasm` no Metro).
   - **APK de debug:** gerado e instalado no OPPO; o app abre. **SQLite nativo:** OK, com persistência.
-  - **Preview no Cloudflare:** **não publicado** (não autorizado).
+  - **Preview no Cloudflare:** publicado em 28/10/2026 → https://preview.casa-em-dia-44l.pages.dev (commit `102c83f`; produção NÃO publicada).
 - `public/_headers` (COOP/COEP, nosniff, referrer, cache) e `public/_redirects` (sem regras, explicado) criados.
 - Docs: `docs/PROVA-DE-VIDA.md`, `docs/ASSINATURA.md`, `docs/DEPLOY-CLOUDFLARE.md`; ADR-004 a ADR-008 em `DECISIONS.md`.
+- Pós-aprovação (28/10/2026): nome comercial **Casa em Dia** (package neutro mantido); `jest-expo` instalado (`npm test` passa); projeto `casa-em-dia` criado no Pages clássico (`--force`, porque o wrangler 4.154 desvia para o Workers).
 - Código descartável removido: rota `proto-sqlite`, `metro.config.js`, dependência `expo-sqlite`, `android/`, `dist/`, app de prova desinstalado do OPPO.
 
 ## Próximo passo
-Aguardando o prompt da próxima etapa. As decisões pendentes abaixo NÃO foram aprovadas junto com a etapa. Candidatos: autorizar o preview no Pages (login `npx wrangler login` feito por ele) para testar no iPhone; aprovar o runner de testes (ADR-008).
+Kaynan testa o preview no iPhone (iOS 26/18) e no Android: abrir, adicionar à Tela de Início, modo avião (esperado: não abre offline). Depois, aguardar o prompt da próxima etapa.
 
 ## Bloqueios
-- Preview no Cloudflare depende de autorização e de login do Kaynan.
+- Nenhum.
 
 ## Decisões pendentes
-1. `android.package` definitivo (ADR-005, hoje provisório `com.kaynansouza.financasecasa`).
-2. Direct Upload como forma de deploy (ADR-006).
-3. Instalar `jest-expo` (ADR-008).
+1. Antes da produção: Pages clássico ou migrar para Workers (ADR-006).
+2. Escrever o teste de fronteira (`src/core` sem react/expo; módulos nativos só em `src/platform`).
+3. Dependências do template que ninguém usa (avaliar remoção).
 4. Tornar o `cmake.dir` (CMake 4.1.2) reproduzível, já que `android/` é gerado.
 5. iPhone/PWA no critério de saída do MVP; 24 pontos de impacto da arquitetura (DECISIONS.md).
 6. Criptografia do banco no PWA (SQLCipher não existe no web) e despejo do OPFS (`persisted() = false`).
@@ -35,6 +36,6 @@ Aguardando o prompt da próxima etapa. As decisões pendentes abaixo NÃO foram 
 10. Dependências extras do template e as 8 vulnerabilidades do `npm audit` (não analisadas).
 
 ## Não testado
-- Preview em `*.pages.dev`; abrir, instalar e usar offline no **iPhone** e no **Android via navegador**.
+- Preview aberto no **iPhone** e no **Android via navegador** (só verificado por `curl`); instalação na Tela de Início; modo avião.
 - OPFS / SharedArrayBuffer no **Safari do iOS** (o web só foi testado no Chrome 156 do Windows).
 - Build **release** assinado; SQLCipher; emulador Android.

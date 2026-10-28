@@ -65,7 +65,10 @@ Os arquivos ficam em `public/` e o `expo export` os copia para a raiz de `dist/`
 **Conclusão:** o fallback de SPA **não deve** ficar no `_redirects`. O `public/_redirects` foi mantido sem regras, só com um comentário explicando. Atenção: se um dia existir `404.html` no output, o comportamento SPA deixa de valer.
 
 ## 5. Preview no Cloudflare Pages
-**NÃO publicado**: o Kaynan respondeu "Ainda não" à autorização de preview. Nenhum login foi feito. Ficam **não testados**: abrir no iPhone e no Android pela URL `*.pages.dev`, instalar na Tela de Início e o modo avião (que já se sabe que não funcionaria, por falta de service worker). Passo a passo em `docs/DEPLOY-CLOUDFLARE.md`.
+**Publicado em 28/10/2026** (autorizado pelo Kaynan; login feito por ele): **https://preview.casa-em-dia-44l.pages.dev** (ambiente Preview, commit `102c83f`). Produção **não** publicada.
+- Verificado por `curl`: `/` 200 com o placeholder "Casa em Dia — em construção"; headers de `_headers` aplicados; `x-robots-tag: noindex`; SPA fallback 200; `/index.html` 308 → `/`.
+- O wrangler 4.154 desvia `pages project create` para o Workers e falha; foi preciso usar `--force` uma vez (ver `docs/DEPLOY-CLOUDFLARE.md`).
+- **Pendente (teste manual do Kaynan):** abrir no iPhone (iOS 26 e 18) e no Android; adicionar à Tela de Início; modo avião. Esperado: **não abre offline** (sem service worker) e a instalação vira atalho sem manifest; isso é tarefa futura.
 
 ## 6. Estratégia de build Android
 | Opção | Como | Custo / requisitos | Prós | Contras |

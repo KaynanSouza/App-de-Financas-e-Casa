@@ -35,6 +35,7 @@
 - Data: 28/10/2026 · Status: aceita (pelo Kaynan)
 - Decisão proposta: Cloudflare Pages via `wrangler pages deploy` (sem integração Git). Nada publica sem comando explícito, e o build é local.
 - Consequência: um projeto Direct Upload não migra para a integração Git depois.
+- Atualização 28/10/2026: o wrangler 4.154 desvia a criação para "Pages dentro do Workers". O Kaynan escolheu o **Pages clássico com `--force`** para o preview. **Pendente antes da produção:** decidir se continuamos no Pages clássico ou migramos para Workers (assets estáticos).
 
 ### ADR-007 — Sem fallback SPA em `_redirects`
 - Data: 28/10/2026 · Status: aceita (verificado)
