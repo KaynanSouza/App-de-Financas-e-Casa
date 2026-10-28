@@ -1,6 +1,6 @@
 # DECISIONS.md — Registro de decisões
 
-> Estado: **completo ao fim da Fase 2 (28/10/2026)**. Duas séries: **ADR-001..008** (Fase 1, arquitetura/ambiente) e **D-001..D-043** (Descoberta).
+> Estado: **Fase 2 completa (28/10/2026) + Fase 3 em andamento**. Duas séries: **ADR-001..008** (Fase 1, arquitetura/ambiente) e **D-001..D-045** (Descoberta e Fase 3).
 > Formato: título · data · status (proposta / aceita / provisória / substituída) · decisão · alternativas descartadas · motivo/consequências.
 > Provisórias com revisão marcada: D-004, D-033 (EAN no iPhone), D-038 (Intl no Hermes), D-039 (KDF) → **Fase 3, spike E-02**; D-031 (feriados) → R2; D-043 (data do beta) → após o Sprint 1; ADR-006 (Pages × Workers) → antes da produção.
 
@@ -17,6 +17,7 @@
 | Técnica | D-036..D-042 |
 | Ritmo e restrições | D-043 |
 | Lacunas da Fase 2 | D-044 |
+| Fase 3: código antigo encontrado | D-045 (substitui D-036) |
 
 ## Decisões já tomadas pelo humano (a formalizar como ADR)
 
@@ -316,7 +317,7 @@ Todos os itens marcados "provável" ainda precisam ser confirmados na documenta�
 - Já confirmados do backlog: centavos; mascaramento `****1234`; desfazer importação em 30 dias; mesclagem "mais recente vence, comprado prevalece no empate", com resumo antes de aplicar.
 - Descartadas: mês a partir do salário por padrão; reter CSV 30 dias por padrão; manter preferências ao apagar; política longa estilo LGPD.
 
-### D-036 — Épicos 1 e 2: reescrever (não há código para portar)
+- Data: 28/10/2026 · Status: **substituída pela D-045** (28/10/2026: o código antigo foi encontrado) · muda o backlog
 - Data: 28/10/2026 · Status: aceita · **muda o backlog**
 - Contexto: o código antigo (TypeScript/Node) não está mais disponível; o Kaynan prefere reescrever.
 - Decisão: **F-07 vira reescrita**: parsing, perfis, dedupe, categorização, correção com aprendizado e dashboard (C-01..C-06) são implementados do zero em `src/core` (TS puro), usando os critérios de aceite do backlog como contrato. Situação de C-01..C-06: "Concluído (portar)" → **"A fazer (reescrever)"**.
@@ -373,3 +374,18 @@ Todos os itens marcados "provável" ainda precisam ser confirmados na documenta�
 - Decisão: criar **F-08 — Onboarding e ajuda** (MVP, **Must**, **nunca cortar**): instalação obrigatória no iPhone (D-002), onboarding em 4 passos (D-023), ajuda para instalar o APK e para exportar o CSV de cada banco (D-030). Planejado no Sprint 2.
 - Descartadas: distribuir em F-01/F-06/C-01 (o trabalho ficaria escondido na estimativa); F-08 como Should.
 - Motivo: sustenta o critério de sucesso "amigos usam sem ajuda" (D-012) e o risco prioritário "não conseguir instalar/usar" (D-043).
+
+### D-045 — Código antigo encontrado: portar com triagem (substitui D-036)
+- Data: 28/10/2026 · Status: aceita (o Kaynan delegou a escolha ao agente: "faça o que achar mais recomendado")
+- Contexto: o Kaynan encontrou o código antigo em `C:\Users\kayna\Documents\Projetos\dia-a-dia` ("Dia a Dia"): Expo SDK 57 + Expo Router + TypeScript, cerca de 11,2 mil linhas em `src`, Épicos 1 e 2 e parte do 3 (contas, recorrência, plano de notificações, ações, lembrete de backup). **Não há testes nem golden files.** Só Android (nenhum cuidado com o web).
+- Decisão: **F-07 volta a ser porte, com triagem por módulo** (inventário na E-06):
+  1. **Lógica pura** (CSV, perfis, mapeamento, limites, fatiamento, categorização, normalização, recorrência, plano de notificações, máquina de bloqueio, máscara, sanitização do log, barramento) → copiada para `src/core`, adaptada às convenções deste projeto e coberta por **testes escritos durante o porte** (caracterização + critérios do backlog).
+  2. **Código de plataforma** (`expo-file-system`, `expo-secure-store`, `expo-sqlite`, notificações, biometria, captura de tela) → reescrito como adaptador **atrás das portas** de `src/platform`, com o código antigo como referência para o `.native.ts` e um `.web.ts` novo.
+  3. **Telas** (cerca de 3,2 mil linhas) → só referência de fluxo; refeitas no design system novo (D-015..D-028).
+  4. **Divergências com decisões vigentes** prevalecem as vigentes: backup antigo guarda o `.db` SQLCipher cifrado → só o envelope (cabeçalho como AAD, AES-GCM, limites anti-DoS, KDF parametrizada) é aproveitado, e o conteúdo vira dump lógico (D-008); modelo TF-IDF + Naive Bayes → C-07, **R2** (não entra no MVP); categorias antigas → ajustadas às 15 do D-030.
+- Fonte congelada: `dia-a-dia` @ `e59f1a1` + árvore de trabalho de 28/10/2026 (20 arquivos alterados sem commit; `git diff` sha256 `2305defab43f…`). O repositório antigo é **só leitura**: o agente não commita nem altera nada lá. Se o Kaynan mudar algo lá depois, registrar a nova referência aqui.
+- Bancos: meta do MVP continua a do **D-030** (Nubank, C6, Santander, BB, Itaú, Bradesco), com golden files. Os perfis antigos de **Caixa e Inter** são portados como **extras**, sem bloquear a saída do MVP; C6 e Santander são novos. Não se sabe se os perfis antigos vieram de extratos reais: os golden files anonimizados decidem.
+- KDF/cripto: o código antigo usa `@noble/hashes` (Argon2id 19 MiB/t=2 no backup; PBKDF2-SHA-256 150 mil iterações no PIN, "~1 s no Hermes") e `@noble/ciphers` (AES-GCM). Isso entra como **candidata forte** na E-02 (JS puro, igual no Hermes e no web); a decisão final segue por medição (D-039). Dependência a justificar formalmente (licença, bundle, manutenção) antes de entrar.
+- Licença e autoria: o código é do Kaynan; entra neste repositório sob GPL-3.0; cada commit de porte cita a origem (`Ported-from: dia-a-dia@e59f1a1+wt <caminho>`).
+- Descartadas: reescrever do zero (desperdiça código funcional em TS); copiar o projeto inteiro (traz decisões incompatíveis: backup cru, só Android, SDK 57, sem testes, package `com.diaadia.app`).
+- Consequências: C-01..C-06 passam de "Reescrever" para **"Portar (adaptar)"**; A-01, A-04, A-05 e o lembrete de backup ganham base existente; o golden de banco continua dependendo das amostras anonimizadas; SDK 57 → 58 exige conferir a doc atual das APIs usadas; a estimativa do MVP cai.

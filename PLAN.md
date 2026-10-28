@@ -1,13 +1,13 @@
 # PLAN.md — Plano de etapas · Casa em Dia
 
-> Versão 1.0 · 28/10/2026 · Fase 3 (Codificação), passo "Divisão em Etapas". **Aguardando aprovação do Kaynan.**
-> Fontes: `docs/backlog-local-first.pdf` (escopo funcional), `BRD.md` §4–5 (escopo vigente, D-036/D-044), `TRD.md`, `UX.md`, `ARCH.md`, `DECISIONS.md` (ADR-001..008, D-001..D-044), `docs/matriz-paridade.md`, skills `backlog-pbi`, `git-versionamento`, `testing-strategy`.
+> Versão 1.1 · 28/10/2026 · Fase 3 (Codificação), passo "Divisão em Etapas". v1.1: código antigo encontrado → porte com triagem (D-045). **Aguardando aprovação do Kaynan.**
+> Fontes: `docs/backlog-local-first.pdf` (escopo funcional), `BRD.md` §4–5 (escopo vigente, D-044/D-045), `TRD.md`, `UX.md`, `ARCH.md`, `DECISIONS.md` (ADR-001..008, D-001..D-045), código antigo `dia-a-dia` (§0.4), `docs/matriz-paridade.md`, skills `backlog-pbi`, `git-versionamento`, `testing-strategy`.
 > Regra: **uma etapa por vez**; só avança com testes verdes + aprovação. Cada etapa = 1 sessão de 1–3 h (com até 5 h/semana, D-043, ≈ 2 etapas/semana).
 
 ## 0. Como ler este plano
 
 ### 0.1 Desvios em relação ao pedido (justificados; confirmar nas perguntas §17)
-1. **E-06 não é "porte"**: não existe código antigo (D-036). A E-06 vira **reescrita da base do núcleo** (inventário de contratos + money/dates/events/ids/texto) com **vetores golden do core** rodando no Jest **e no aparelho**. Os golden files **de banco** (CSV anonimizado) entram na Importação (E-12/E-13), quando houver o script de anonimização e as amostras.
+1. **Código antigo encontrado (D-045, substitui D-036)**: a E-06 é **inventário e porte** do núcleo, como pedido. O porte é **com triagem** (§0.4): lógica pura vai para `src/core` com testes escritos durante o porte; código de plataforma vira adaptador; telas são só referência. Como o código antigo **não tem testes nem golden files**, os golden files **de banco** (CSV anonimizado) continuam na Importação (E-12/E-13).
 2. **Service worker/offline sobe para o Sprint 2 (E-07)**, logo depois da fundação, e não fica perto do fim. Motivos da Descoberta: (a) no iPhone o app da Tela de Início tem **armazenamento separado** do Safari, então a trava "instale primeiro" (D-002) precisa existir antes de qualquer dado real no iPhone; (b) o BRD §4.5 põe manifest + SW no Sprint 2; (c) PWA preso em cache antigo é caro de corrigir depois; (d) L-01 ("offline no mercado") e todas as demonstrações no iPhone dependem disso.
 3. **Playwright sobe para a E-03** (D-042 previa no sprint do PWA). O contrato da porta `db` precisa rodar no adaptador web real (OPFS/WASM), e isso não roda no Jest/Node.
 4. **E-02 tem uma página de benchmark descartável** (não é UI de produto), publicada num preview de branch `spike/*`, porque a medição precisa ser feita num iPhone real.
@@ -27,6 +27,36 @@
 ### 0.3 Legenda
 Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa descrita). Testes: **U** unit core · **G** golden · **C** contrato de porta (fake no Jest) · **I** integração SQLite nos adaptadores reais (autoteste/Playwright) · **E** e2e web (Playwright + axe) · **M** manual em aparelho real (**só manual** quando marcado ⓜ).
 
+### 0.4 Porte do código antigo (D-045)
+- **Fonte congelada, só leitura:** `C:\Users\kayna\Documents\Projetos\dia-a-dia` @ `e59f1a1` + árvore de trabalho de 28/10/2026 (20 arquivos sem commit). Expo SDK 57, TypeScript, só Android, **sem testes**. Nada é alterado lá.
+- **Receita por arquivo:** (1) ler o original e anotar o comportamento; (2) escrever os testes primeiro (caracterização + critério do backlog/BRD); (3) copiar para o destino; (4) adaptar: imports de plataforma → portas, `expo-sqlite` → porta `db`, convenções do TRD §3 (UUID, centavos, `AAAA-MM-DD`), mensagens e logs sem dados; (5) conferir a API do **SDK 58** na doc atual; (6) commit `feat(<scope>): port <módulo> (<PBI>)` com rodapé `Ported-from: dia-a-dia@e59f1a1+wt src/<caminho>`.
+- **Nunca trazer:** `android/`, `.expo/`, assets e ícones antigos, `com.diaadia.app`, o snapshot `sqlcipher_export` do backup, o modelo `ml/*` (C-07, R2), qualquer dado.
+- **Dependências do código antigo** (`@noble/hashes`, `@noble/ciphers`, `@react-native-community/datetimepicker`, `expo-intent-launcher`, `expo-linear-gradient`…): cada uma só entra quando a etapa precisar, com justificativa e aviso (AGENTS §9).
+
+| Módulo antigo (`src/…`) | Decisão | Etapa |
+|---|---|---|
+| `lib/{bytes,text,time}`, `events/*`, `core/parsing/values`, `security/privacy/mask`, `logging/sanitize`, `categorization/normalize` | Portar (puro) | E-06 |
+| `db/migrations/runner`, `db/transaction`, `db/client`, `db/schema/*` | Adaptar (runner) · referência (esquema) | E-03 |
+| `security/lock/{lock-machine,lock-store}`, `pin/pin-hash`, `keystore/*`, `biometrics/*` | Portar (puro) · adaptar (plataforma) | E-04 |
+| `backup/{format,kdf,errors}` · `backup/{export,restore}-backup` | Portar envelope/KDF · **reescrever conteúdo** (D-008) | E-05 |
+| `data-rights/*` | Referência (nativo) · web novo | E-09 |
+| `security/privacy/PrivacyShield` | Adaptar → `screen-security` | E-10 |
+| `logging/{logger,rotation}`, `services/diagnostics` | Adaptar | E-11 |
+| `import/stream/*`, `import/{sniff,limits}` | Portar · `reader` → porta `files` | E-12 |
+| `import/profiles/*`, `import/row-mapper` | Portar; + C6, Santander novos | E-13 |
+| `core/dedup/fingerprint`, `import/{commit,undo,csv-retention}` | Portar | E-14 |
+| `import/{scheduler,analyze,job,progress-store,session,steps}` | Portar (nativo) · Web Worker novo | E-15 |
+| `categorization/{engine,dictionary,fuzzy,factory,seed}`, `builtin/*` | Portar; categorias → D-030 | E-16 |
+| `categorization/learn` | Portar | E-17 |
+| `categorization/ml/*` | **Fora do MVP** (C-07, R2) | — |
+| `dashboard/*` · `components/charts` | Portar SQL · gráficos novos (D-021) | E-18 |
+| `services/recurrence/*`, `bills/*` | Portar; conferir D-031 | E-20 |
+| `services/notifications/{native}`, `services/diagnostics/alerts` | Adaptar → `notifications.native.ts` | E-22 |
+| `services/notifications/{plan,reminders,scheduler,backup-reminder}` | Portar (plano/ids) + adaptar | E-23 |
+| `services/notifications/actions` | Adaptar | E-25 |
+| `transactions/manual`, `maintenance.ts` | Avaliar no inventário (lançamento manual não é PBI do MVP: **perguntar** antes de portar) | E-06 |
+| `app/**`, `components/**`, `theme/*` | Só referência de fluxo; UI nova (D-015..D-028) | E-01 em diante |
+
 ---
 
 ## 1. Visão geral
@@ -45,7 +75,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 | 9 — Compras II | E-35..E-37 | Lista por CSV, histórico de preços | L-02, L-08, L-05 |
 | 10 — Polimento e beta | E-38..E-40 | A11y/desempenho, segurança, pré-beta | — (critérios D-012) |
 
-**Estimativa grosseira:** 40 etapas × 1–3 h ≈ 80–110 h + marcos manuais ⇒ **5–7 meses** a 5 h/semana. A data do beta é proposta no **M-0** (fim da E-11), com a velocidade medida (D-043).
+**Estimativa grosseira:** 40 etapas × 1–3 h; com o porte (D-045), Importação e Contas/Lembretes tendem ao limite inferior ⇒ ≈ 65–95 h + marcos manuais ⇒ **4–6 meses** a 5 h/semana. Se o porte render mais que o esperado, etapas vizinhas podem ser juntadas (ex.: E-16+E-17, E-20+E-21), sempre com aprovação. A data do beta é proposta no **M-0** (fim da E-11), com a velocidade medida (D-043).
 
 ### 1.1 Marcos de teste em aparelho real
 | Marco | Quando | O quê | Critério |
@@ -64,6 +94,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 ### E-01 — Esqueleto do app, design system mínimo e pipeline
 - **Sprint:** 0 · **PBIs:** F-07 (critério "APK de teste cedo"); base de D-015..D-018, D-026, D-028.
 - **Objetivo:** o app abre nas 5 abas, com tema claro/escuro e componentes base, como APK de debug no OPPO e como preview no iPhone.
+- **Porte (D-045):** `theme/index.ts` e `components/{ui,form,PinPad,Icon}.tsx` só como referência de fluxo; tokens novos do D-016.
 - **Escopo:** limpar as rotas de exemplo do template; tokens em `src/ui/theme` (cores D-016, tipografia D-017, espaçamento/raio UX §5.3); tema automático + escolha manual (em memória até a E-10); componentes `AppText` (escala tipográfica), `Button`, `IconButton`, `Card`, `Banner`, `EmptyState`; layout de abas (Início · Gastos · Contas · Compras · Mais) com `EmptyState` em cada uma; coluna centralizada ~480 px no web (D-020); safe areas; `cmake.dir` reproduzível (config plugin ou variável de ambiente); scripts npm (`build:web`, `serve:web`, `android:debug`); teste de fronteira de imports; script "sem URL externa no `dist/`".
 - **Fora de escopo:** persistência de preferências (E-10), ícone final (E-07/E-38), PWA/manifest (E-07), qualquer dado.
 - **Dependências:** nenhuma (Fase 1 aprovada).
@@ -86,6 +117,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 ### E-02 — SPIKE: criptografia do banco no web e KDF
 - **Sprint:** 0 · **PBIs:** F-03 (estratégia web), F-01/F-06 (KDF). Decisões D-004, D-039.
 - **Objetivo:** escolher, por medição em iPhone real, a estratégia de cifra do banco no web e a KDF única (PIN e backup), registrando ADRs.
+- **Porte (D-045):** `backup/kdf.ts` e `security/pin/pin-hash.ts` (`@noble/hashes`: Argon2id e PBKDF2) entram como candidata forte da KDF; `@noble/ciphers` como plano B de AES-GCM.
 - **Escopo:** branch `spike/web-encryption` (código **descartável**, não vai para a `main`); gerador de dados sintéticos (~10 mil transações, reaproveitável em `tests/fixtures/generators/`, este sim vai para a `main`); bancada comparando as 3 opções do D-004: (1) banco em memória + snapshot AES-GCM no OPFS, (2) cifra por coluna na aplicação, (3) SQLite WASM com cifra por página (verificar a documentação atual de builds como SQLite3 Multiple Ciphers / SQLCipher WASM e o encaixe com o `expo-sqlite` web); KDF: (a) PBKDF2-SHA-256 (WebCrypto no web; lib JS ou WebCrypto do runtime no Android, **verificar** o que o Hermes/SDK 58 oferece), (b) Argon2id JS/WASM nos dois, (c) módulo nativo. Modelo de chaves a decidir: **DEK aleatória envolvida por KEK derivada do PIN** (proposta) × chave derivada direto do PIN.
 - **Fora de escopo:** UI de produto, porta `db` definitiva (E-03), passkey (R2, D-003).
 - **Dependências:** E-01 (pipeline de preview e APK).
@@ -95,7 +127,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
   - [ ] Bancada web: para cada opção, medir abrir/carregar, inserir 1 transação (custo de persistir), consulta do dashboard, pico de memória (o que der para medir no Safari; registrar o método), tamanho extra no bundle.
   - [ ] Bancada KDF: tempo no OPPO e no iPhone para parâmetros candidatos (alvo ≈ 1–2 s, D-041); vetor de teste com saída igual nos dois.
   - [ ] Verificar recomendações atuais (OWASP) para PBKDF2/Argon2id e registrar a fonte e a data.
-  - [ ] ADR **D-045** (cifra do banco web) e **D-046** (KDF + parâmetros + modelo de chaves); atualizar D-004/D-039, TRD §1/§2.1/§10.1, matriz (F-03), skills `sqlite-web-encrypted` e `backup-cross-platform`.
+  - [ ] ADR **D-046** (cifra do banco web) e **D-047** (KDF + parâmetros + modelo de chaves); atualizar D-004/D-039, TRD §1/§2.1/§10.1, matriz (F-03), skills `sqlite-web-encrypted` e `backup-cross-platform`.
 - **Critérios de aceite:** (1) tabela de medições por opção no iPhone real (iOS 18 e/ou 26) e no Chrome desktop, com método descrito; (2) a opção escolhida carrega ~10 mil transações em **≤ 2 s** no iPhone (ou o ADR registra a degradação e o plano); (3) KDF escolhida em ≈ 1–2 s no OPPO e no iPhone, com vetor de teste idêntico; (4) dependência nova (se houver) justificada: bundle web/nativo, manutenção, licença GPL-3.0-compatível, suporte web **e** Android; (5) nenhuma linha do spike na `main` além de ADR/docs e do gerador.
 - **Testes:** U (gerador determinístico; vetor KDF) · M: medições no iPhone e no OPPO ⓜ.
 - **UX/a11y/segurança:** STRIDE da opção escolhida (I: aparelho perdido; força bruta do PIN de 10⁶ combinações → KDF + espera crescente); chave não-extraível e só em memória no web.
@@ -110,10 +142,11 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 ### E-03 — Porta de banco, migrações e testes de contrato
 - **Sprint:** 1 · **PBIs:** F-03; F-07 ("esquema SQLite com migrações versionadas"); L-01 (convenção UUID desde o início).
 - **Objetivo:** `src/platform/db` com adaptador nativo (SQLCipher) e web (decisão da E-02), migrações compartilhadas e a mesma suíte de contrato passando nos dois.
-- **Escopo:** interface orientada a caso de uso (`open(key)`, `exec`, `query`, `transaction`, `close`, `destroy`, `capabilities()`); `db.native.ts` (`expo-sqlite` + `useSQLCipher`, `PRAGMA key`, checagem de `cipher_version`; verificar a doc atual); `db.web.ts` (estratégia D-045; `.wasm` no Metro + COOP/COEP no dev); `db.fake.ts`; `src/storage/migrations` com runner transacional e `schema_migrations`; migração 001: `app_settings`, `event_log`, `lock_state`; convenções do TRD §3 (UUID TEXT via porta `crypto`, centavos INTEGER, `created_at/updated_at`, `deleted_at`, `foreign_keys=ON`); config plugin `allowBackup=false`; rota `/dev/selftest` + script Android; **Playwright** (Chromium + WebKit) contra `wrangler pages dev`; tela **Diagnóstico** mínima (estado do banco, versão do esquema).
+- **Porte (D-045):** `db/migrations/runner.ts` (append-only, checksum) e `db/transaction.ts` → `src/storage`; `db/client.ts` (SQLCipher) → base do `db.native.ts`; `schema/0000..0004` como referência, reescritos no modelo do TRD §3 (UUID, centavos, `deleted_at`).
+- **Escopo:** interface orientada a caso de uso (`open(key)`, `exec`, `query`, `transaction`, `close`, `destroy`, `capabilities()`); `db.native.ts` (`expo-sqlite` + `useSQLCipher`, `PRAGMA key`, checagem de `cipher_version`; verificar a doc atual); `db.web.ts` (estratégia D-046; `.wasm` no Metro + COOP/COEP no dev); `db.fake.ts`; `src/storage/migrations` com runner transacional e `schema_migrations`; migração 001: `app_settings`, `event_log`, `lock_state`; convenções do TRD §3 (UUID TEXT via porta `crypto`, centavos INTEGER, `created_at/updated_at`, `deleted_at`, `foreign_keys=ON`); config plugin `allowBackup=false`; rota `/dev/selftest` + script Android; **Playwright** (Chromium + WebKit) contra `wrangler pages dev`; tela **Diagnóstico** mínima (estado do banco, versão do esquema).
 - **Fora de escopo:** chave real do usuário (provedor de chave **de desenvolvimento**, marcado e substituído na E-04; só dados sintéticos até lá); tabelas de módulos.
-- **Dependências:** E-02 (D-045).
-- **Plataformas:** Android = SQLCipher, arquivo cifrado · iPhone/PWA = estratégia D-045 sobre OPFS (≈, declarado na matriz). Portas: `db`, `crypto` (UUID/random).
+- **Dependências:** E-02 (D-046).
+- **Plataformas:** Android = SQLCipher, arquivo cifrado · iPhone/PWA = estratégia D-046 sobre OPFS (≈, declarado na matriz). Portas: `db`, `crypto` (UUID/random).
 - **Tarefas:**
   - [ ] `npx expo install expo-sqlite` (+ `expo-crypto` se ainda não houver), com aviso.
   - [ ] Interface + 3 adaptadores (`satisfies`).
@@ -131,7 +164,8 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 ### E-04 — Bloqueio: PIN, KDF, espera crescente, biometria e guarda da chave
 - **Sprint:** 1 · **PBIs:** F-01 (e chave de F-03).
 - **Objetivo:** o app só mostra dados depois do PIN (ou da biometria no Android), e a chave do banco nunca fica exposta.
-- **Escopo:** portas `local-auth` (Android: biometria; web: `supported:false`), `secure-key` (Android: chave aleatória guardada no Keystore, liberada após autenticação; web: DEK envolvida pela KEK do PIN, só em memória, conforme D-046), `kdf` (D-046), `lifecycle` (2º plano); core puro: política de bloqueio (espera crescente, contador persistido em `lock_state`); telas **Criar PIN** e **Bloqueio** (`PinPad`, UX §4.2); trava 1 min após ir para o 2º plano (padrão fixo; opções na E-10); "Esqueci o PIN" mostra o texto de UX §7 (o fluxo de apagar vem na E-09).
+- **Porte (D-045):** `security/lock/lock-machine.ts` e `lock-store.ts` → `src/core/lock`; `pin/pin-hash.ts` (depois da D-047); `keystore/db-key.ts`, `secure-kv.ts`, `biometrics.ts` → base dos adaptadores `.native.ts`; `AppLockProvider.tsx` como referência.
+- **Escopo:** portas `local-auth` (Android: biometria; web: `supported:false`), `secure-key` (Android: chave aleatória guardada no Keystore, liberada após autenticação; web: DEK envolvida pela KEK do PIN, só em memória, conforme D-047), `kdf` (D-047), `lifecycle` (2º plano); core puro: política de bloqueio (espera crescente, contador persistido em `lock_state`); telas **Criar PIN** e **Bloqueio** (`PinPad`, UX §4.2); trava 1 min após ir para o 2º plano (padrão fixo; opções na E-10); "Esqueci o PIN" mostra o texto de UX §7 (o fluxo de apagar vem na E-09).
 - **Fora de escopo:** passkey/Face ID (R2, D-003); opções de tempo e bloqueio de print (E-10); onboarding completo (E-08).
 - **Dependências:** E-03.
 - **Plataformas:** Android = PIN 6 + biometria (falhou → PIN) · iPhone/PWA = só PIN (≈, D-003). Portas: `local-auth`, `secure-key`, `kdf`, `lifecycle`, `db`.
@@ -152,6 +186,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 ### E-05 — Backup único criptografado: formato, ida e volta, entre plataformas
 - **Sprint:** 1 · **PBIs:** F-06 (formato, restauração, teste automatizado). D-008.
 - **Objetivo:** um arquivo `.cedbkp` gerado no Android restaura no PWA e vice-versa, com teste automatizado de ida e volta.
+- **Porte (D-045):** `backup/format.ts`, `kdf.ts`, `errors.ts` (envelope, AAD, limites anti-DoS) → `src/core/backup`; **conteúdo novo** (dump lógico, D-008) no lugar do snapshot `sqlcipher_export`; magic `CEDBKP`.
 - **Escopo:** core `src/core/backup` (`serializeBackup`/`parseBackup`, header autenticado como AAD, `formatVer` 1, `schemaVersion`); dump lógico neutro gerado a partir do registro de tabelas do `src/storage` (nunca o `.db` cru); compressão **a verificar** (se não houver API comum Hermes/web, `formatVer 1` sem compressão, com flag no header); restauração numa transação + evento `backup.restored` (para reagendar alertas depois); porta `files` (salvar/compartilhar e escolher arquivo; Android: seletor/Compartilhar; web: Web Share com arquivo ou download + `<input type=file>`); tela **Mais → Backup** mínima (fazer backup com senha + confirmação; restaurar com arquivo + senha + confirmação "substitui tudo"); data do último backup em `app_settings`; vetores `tests/fixtures/backup/v1-android.cedbkp` e `v1-web.cedbkp`, gerados **em cada plataforma** a partir da semente sintética.
 - **Fora de escopo:** lembretes de backup (E-08 no iPhone; E-23 no Android), aviso "há N dias" no Início (E-08).
 - **Dependências:** E-03, E-04 (KDF).
@@ -169,20 +204,21 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 - **Riscos / plano B:** etapa grande → **E-05a** (core + Jest) e **E-05b** (UI + vetores cruzados); Web Share de arquivo falha no standalone → download (D-029); memória do iPhone no backup grande → processar em blocos.
 - **Status:** [ ] pendente
 
-### E-06 — Núcleo base (F-07 reescrito): inventário, money, datas, eventos, golden do core
+### E-06 — Inventário e porte do núcleo (F-07): base pura, golden do core e CI
 - **Sprint:** 1 · **PBIs:** F-07.
-- **Objetivo:** `src/core` tem a base pura (dinheiro, datas, eventos, ids, texto) com vetores golden passando no Jest **e no aparelho**, mais a CI.
-- **Escopo:** `docs/F-07-inventario.md`: módulo a módulo (parsing, perfis, dedupe, categorização, correção, dashboard, recorrência, backup), decisão "reescrever" (D-036) e o **contrato** de cada um (critérios do backlog/BRD); `money` (centavos, `R$ 1.234,56`, parser BR sem `parseFloat`); `dates` (`AAAA-MM-DD`, somar dias/meses com "dia inexistente → último dia", dia da semana, último dia útil seg–sex, "hoje em America/Sao_Paulo" a partir de um instante); `events` (barramento tipado em memória: `transaction.imported`, `backup.restored`…); `text` (normalizar acentos/caixa/espaços); vetores `tests/fixtures/core/*.json`; checagem de `Intl` com `timeZone` no Hermes (D-038); **CI GitHub Actions** (D-042).
+- **Objetivo:** o inventário do código antigo está fechado e a base pura (dinheiro, datas, eventos, ids, texto) está portada para `src/core`, com vetores golden passando no Jest **e no aparelho**, mais a CI.
+- **Porte (D-045):** `lib/{bytes,text,time}`, `events/*`, `core/parsing/values`, `security/privacy/mask`, `logging/sanitize`, `categorization/normalize` (ver §0.4).
+- **Escopo:** `docs/F-07-inventario.md`: arquivo a arquivo do `dia-a-dia` (≈ 11,2 mil linhas), decisão **reaproveitar / adaptar / reescrever / descartar**, etapa de destino, contrato (critérios do backlog/BRD) e divergências com as decisões vigentes (refina a tabela do §0.4); `money` (centavos, `R$ 1.234,56`, parser BR sem `parseFloat`); `dates` (`AAAA-MM-DD`, somar dias/meses com "dia inexistente → último dia", dia da semana, último dia útil seg–sex, "hoje em America/Sao_Paulo" a partir de um instante); `events` (barramento tipado em memória: `transaction.imported`, `backup.restored`…); `text` (normalizar acentos/caixa/espaços); vetores `tests/fixtures/core/*.json`; checagem de `Intl` com `timeZone` no Hermes (D-038); **CI GitHub Actions** (D-042).
 - **Fora de escopo:** recorrência completa de contas (E-20), parser de CSV (E-12).
 - **Dependências:** E-01 (o núcleo não depende de E-03..E-05).
 - **Plataformas:** = nas duas (core puro); vetores executados no autoteste do APK e do PWA. Portas: `clock`.
 - **Tarefas:**
-  - [ ] Inventário + contratos.
-  - [ ] `money`, `dates`, `events`, `text`, `ids` (interface; implementação via porta `crypto`).
+  - [ ] Inventário + contratos (incluindo a decisão sobre `transactions/manual` e `maintenance.ts`, perguntando antes).
+  - [ ] Testes de caracterização do comportamento antigo → porte de `money`, `dates`, `events`, `text`, `ids` (interface; implementação via porta `crypto`).
   - [ ] Vetores golden + runner comum (Jest e autoteste).
   - [ ] `Intl` no Hermes: registrar o resultado em D-038 e na skill; o core não depende dele.
   - [ ] `.github/workflows/ci.yml` (`npm ci`, `tsc`, `jest`, `expo-doctor`, export web, sem URL externa, rota de autoteste ausente no build de produção). Sem deploy; sem push pelo agente.
-- **Critérios de aceite (F-07):** (1) inventário com decisão por módulo; (2) auth/lar/RLS/filas: N/A (não há código; registrado); (3) esquema com migrações versionadas (feito na E-03, referenciado); (4) **golden do core passa no aparelho** (APK e PWA); golden de perfis de banco: E-12/E-13; (5) funciona sem rede; (6) APK cedo (E-01).
+- **Critérios de aceite (F-07):** (1) inventário com decisão por módulo (reaproveitar/adaptar/reescrever); (2) nada de auth/lar/RLS/filas/servidor portado (o `dia-a-dia` já era local; conferido no inventário); (3) esquema com migrações versionadas (feito na E-03, referenciado); (4) **golden do core passa no aparelho** (APK e PWA); golden de perfis de banco: E-12/E-13; (5) funciona sem rede; (6) APK cedo (E-01).
 - **Testes:** U (incluindo `TZ=America/Sao_Paulo` e `TZ=UTC`, viradas de mês/ano, 29/02, horário de verão histórico) · G (vetores) · I (autoteste nos dois) .
 - **UX/a11y/segurança:** formatação de valor também produz o **rótulo falado** ("cento e oitenta e dois reais", "menos …") para o `MoneyText`.
 - **Demonstração:** APK e URL: autoteste mostra "Núcleo: N/N vetores OK"; Diagnóstico mostra "Intl com fuso: sim/não".
@@ -230,6 +266,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 ### E-09 — Exportar e apagar meus dados
 - **Sprint:** 2 · **PBIs:** F-04. D-035.
 - **Objetivo:** o usuário exporta os dados em JSON/CSV e apaga tudo com confirmação forte.
+- **Porte (D-045):** `data-rights/export-data.ts` e `wipe.ts` (Android) → referência; o wipe web é novo.
 - **Escopo:** "Exportar meus dados" (JSON completo + CSV de transações; formato exato a confirmar na etapa: 2 arquivos ou 2 botões) com aviso "não criptografado"; "Apagar todos os dados": PIN/biometria + digitar APAGAR; Android: banco, chave do Keystore, notificações agendadas (hook vazio até a E-23), temporários, preferências; web: OPFS, chaves/metadados, caches e registro do SW, storage; volta ao onboarding; fluxo "Esqueci o PIN" → restaurar backup ou apagar.
 - **Dependências:** E-04, E-05 (porta `files`), E-07.
 - **Plataformas:** Android = Compartilhar nativo · iPhone/PWA = Web Share/download (= ?, conforme E-05). Portas: `files`, `db`, `secure-key`, `notifications` (hook).
@@ -244,6 +281,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 ### E-10 — Configurações, modo privacidade e proteção de tela
 - **Sprint:** 2 · **PBIs:** F-01 (tempo configurável, capturas/Recentes), D-015, D-022, D-029, D-035.
 - **Objetivo:** o usuário ajusta tema, tempo de trava, captura de tela e o modo privacidade, e as escolhas persistem.
+- **Porte (D-045):** `security/privacy/PrivacyShield.tsx` (`expo-screen-capture`) → base do adaptador `screen-security.native.ts`; `privacy/mask.ts` já portado na E-06.
 - **Escopo:** Configurações (UX nº 39): tema (auto/claro/escuro, persistido), trava (imediato/1/5/15 min), bloquear print/Recentes (Android, **ligado por padrão**), mês financeiro "começa no dia N" e semana dom/seg (D-035; consumidos depois); `MoneyText` com modo privacidade global 👁 (`R$ ••••`, leitor "valor oculto", lembrado); porta `screen-security` (verificar a lib atual; web `supported:false`).
 - **Dependências:** E-04, E-06.
 - **Plataformas:** Android = proteção de tela ligada · iPhone/PWA = ✕ proteção de tela → modo privacidade (declarado na tela). Portas: `screen-security`, `db`.
@@ -257,6 +295,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 ### E-11 — Diagnóstico, log local e 1º APK release assinado (M-0)
 - **Sprint:** 2 · **PBIs:** F-05; F-07 (APK); D-007.
 - **Objetivo:** o autor diagnostica falhas sem ver dados sensíveis, e existe um APK release assinado para os amigos.
+- **Porte (D-045):** `logging/logger.ts`, `rotation.ts`, `sanitize.ts` → `src/core/log` + repositório; `services/diagnostics` como referência.
 - **Escopo:** `event_log` com níveis, rotação (7 dias / 1 MB), API tipada que aceita só campos permitidos (sem valores, descrições ou contas); eventos: backup, restauração, wipe, falhas (importação/alertas entram nas etapas deles); tela Diagnóstico (versão semver + `versionCode`, esquema, armazenamento, persistência, autoteste só no debug) com "Compartilhar log"; build **release** `arm64-v8a` + `armeabi-v7a`, assinado conforme `docs/ASSINATURA.md` (keystore e senha **só com o Kaynan**; o agente não lê nem grava); **M-0**: medir as horas das etapas E-01..E-11 e propor a data do beta.
 - **Dependências:** E-03, E-05 (porta `files`).
 - **Plataformas:** = nas duas (log no banco; compartilhar por Compartilhar/Web Share/download).
@@ -270,11 +309,12 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 
 ## 5. Sprint 3 — Importação I
 
-> Pré-requisito do sprint: **script local de anonimização** + CSVs anonimizados dos bancos do Kaynan (D-036). Critérios antigos do Épico 2 não estão no repositório (pergunta §17).
+> Pré-requisito do sprint: **script local de anonimização** + CSVs anonimizados dos bancos do Kaynan (D-036/D-045). O código antigo não tem golden files; o contrato é BRD §5.2 + backlog + comportamento do `dia-a-dia` (caracterização).
 
 ### E-12 — Ler CSV: bytes → codificação → delimitador → prévia (+ script de anonimização)
 - **Sprint:** 3 · **PBIs:** C-01 (parte), F-08 (ajuda "como exportar"), F-07 (golden de banco).
 - **Objetivo:** o usuário escolhe um CSV e vê uma prévia correta das linhas, nas duas plataformas.
+- **Porte (D-045):** `import/stream/csv-tokenizer.ts`, `sniff.ts`, `limits.ts` → `src/core/csv` (valores BR já portados na E-06); `stream/reader.ts` (leitura em blocos de 64 KB) → adaptador da porta `files`.
 - **Escopo:** `scripts/anonymize-csv` (roda localmente, fora do git; preserva layout, troca descrições/valores/contas; o agente nunca vê o original); core `src/core/csv`: detecção de codificação (UTF-8 estrito → Windows-1252; verificar suporte no Hermes), BOM, delimitador, RFC 4180, números/datas BR; limites 10 MB / 50 mil linhas (verificação); tela **Importar: escolher arquivo** + prévia de 5 linhas; erro amigável sem ecoar conteúdo; golden de decodificação em `tests/fixtures/csv/<banco>/`.
 - **Dependências:** E-05 (`files`: escolher arquivo), E-06.
 - **Plataformas:** Android = seletor do sistema · iPhone/PWA = seletor no app (≈; "Abrir com" na E-15).
@@ -288,6 +328,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 ### E-13 — Perfis de banco e mapeamento manual (bancos do Kaynan)
 - **Sprint:** 3 · **PBIs:** C-02, C-01 (detecção de formato).
 - **Objetivo:** o app reconhece o banco pelo cabeçalho e, se não reconhecer, deixa o usuário mapear as colunas e salvar o perfil.
+- **Porte (D-045):** `import/profiles/{builtin,detect,types,repo}.ts`, `row-mapper.ts`, telas `import/mapping`/`preview` como referência; perfis Nubank, Itaú, Bradesco, BB portados; Caixa e Inter como extras; C6 e Santander novos.
 - **Escopo:** perfis embutidos versionados (2–3 bancos com amostra anonimizada); detecção por cabeçalho normalizado; tabela `bank_profile` (migração 002) + `account` (`mask_last4`); tela **Prévia/mapeamento** (UX nº 12) com seleção de conta; golden `<caso>.csv` → `<caso>.expected.json` (linhas normalizadas em centavos e `AAAA-MM-DD`).
 - **Dependências:** E-12.
 - **Plataformas:** = (core); perfis novos chegam por APK novo × deploy do PWA (matriz C-02).
@@ -300,6 +341,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 ### E-14 — Ledger, deduplicação, idempotência e desfazer
 - **Sprint:** 3 · **PBIs:** C-03, C-01 (transação única).
 - **Objetivo:** importar grava as transações de uma vez, nunca duplica e pode ser desfeito em até 30 dias.
+- **Porte (D-045):** `core/dedup/fingerprint.ts`, `import/commit.ts`, `undo.ts`, `csv-retention.ts` → core + módulo `import`.
 - **Escopo:** migração 003: `import_batch`, `txn` (com `dedupe_key UNIQUE`, `deleted_at`) e índices do TRD §6; chave de dedupe no core (conta + data + valor + descrição normalizada + ordinal de repetição no arquivo); importação numa transação; evento `transaction.imported`; tela **Resultado** (novas / já existiam) e **Histórico de importações** com Desfazer (≤ 30 dias); lista simples de transações (2 linhas, D-020, `****1234`).
 - **Dependências:** E-13, E-06 (eventos).
 - **Plataformas:** = (SQL nos dois adaptadores).
@@ -312,6 +354,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 ### E-15 — Arquivos grandes, progresso e "Abrir com"
 - **Sprint:** 3 · **PBIs:** C-01 (limites, streaming, sem travar a tela).
 - **Objetivo:** importar 50 mil linhas sem travar a tela, com progresso e cancelamento.
+- **Porte (D-045):** `import/scheduler.ts` (fatias de ~8 ms), `analyze.ts`, `job.ts`, `progress-store.ts` → nativo; o Web Worker do web é novo.
 - **Escopo:** parsing em blocos; **Web Worker** no web; fatias com `await` no nativo; barra "Lendo N de M linhas" + cancelar; intent filter `.csv` no Android ("Abrir com"), via config plugin; notificação de conclusão em 2º plano no Android **adiada para a E-23** (precisa da porta `notifications`) ou degradada (registrar); medições D-041.
 - **Dependências:** E-14.
 - **Plataformas:** Android = fatias + "Abrir com" · iPhone/PWA = Web Worker; só seletor; sem aviso em 2º plano (a tela mostra o progresso) (≈).
@@ -328,7 +371,8 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 ### E-16 — Categorização por regras e dicionário (+ casos especiais)
 - **Sprint:** 4 · **PBIs:** C-04. D-030.
 - **Objetivo:** transações importadas recebem categoria automaticamente, com transferências e faturas fora dos totais.
-- **Escopo:** 15 categorias padrão editáveis (D-030; migração 004 `category`, `category_rule`); pipeline de camadas (regra do usuário → regra embutida → dicionário de estabelecimentos → nenhuma); dicionário embutido versionado, montado do zero; casos especiais: transferência entre contas próprias (sugere o par em ≤ 3 dias, com confirmação), pagamento de fatura, parcela "03/10" (`installment_no/total`), estorno vinculado à compra original; tela **Categorias** (renomear/criar/arquivar).
+- **Porte (D-045):** `categorization/{engine,dictionary,fuzzy,normalize,factory,seed}.ts` e `builtin/{categories,merchants}.ts` → core; categorias ajustadas às 15 do D-030; `ml/*` (Naive Bayes) **fica de fora** (C-07, R2).
+- **Escopo:** 15 categorias padrão editáveis (D-030; migração 004 `category`, `category_rule`); pipeline de camadas portado (regra do usuário → regra embutida → dicionário de estabelecimentos → nenhuma); dicionário embutido versionado, a partir do `builtin/merchants.ts` antigo (revisado: só nomes genéricos de estabelecimentos); casos especiais: transferência entre contas próprias (sugere o par em ≤ 3 dias, com confirmação), pagamento de fatura, parcela "03/10" (`installment_no/total`), estorno vinculado à compra original; tela **Categorias** (renomear/criar/arquivar).
 - **Dependências:** E-14.
 - **Plataformas:** = (core).
 - **Critérios de aceite:** (1) cada transação tem `category_source`; (2) transferência e fatura ficam fora dos totais; (3) parcela é reconhecida e agrupada; (4) estorno abate a categoria original; (5) cobertura medida no conjunto anonimizado do Kaynan (meta final de 70% na E-19).
@@ -340,6 +384,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 ### E-17 — Correção manual com aprendizado
 - **Sprint:** 4 · **PBIs:** C-05.
 - **Objetivo:** corrigir a categoria de uma transação cria uma regra que acerta as próximas.
+- **Porte (D-045):** `categorization/learn.ts` ("aplicar às parecidas") → core + módulo.
 - **Escopo:** tela **Detalhe/corrigir** (UX nº 10): trocar categoria, "aplicar às parecidas" (prévia de quantas), regra criada (`source='user'`, `exact`/`contains`); tela **Regras de categoria** (editar/excluir); fila "Sem categoria (N) [Revisar]".
 - **Dependências:** E-16.
 - **Critérios de aceite:** (1) a correção gera regra e recategoriza as parecidas só com confirmação; (2) a regra do usuário tem prioridade sobre o dicionário; (3) desfazer a correção (toast 10 s); (4) nada sai do aparelho.
@@ -350,6 +395,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 ### E-18 — Dashboard por categoria e período
 - **Sprint:** 4 · **PBIs:** C-06. D-019, D-021, D-022.
 - **Objetivo:** ver quanto gastei por categoria no mês, em ≤ 2 s com ~10 mil transações, nas duas plataformas.
+- **Porte (D-045):** `dashboard/queries.ts` (SQL com reconciliação) e `service.ts` → `src/storage`/módulo; `components/charts.tsx` só como referência (gráficos novos sobre `react-native-svg`, D-021).
 - **Escopo:** agregações em SQL (mês civil ou "começa no dia N", D-035); tela **Gastos** com barras horizontais próprias sobre `react-native-svg` (instalar se ainda não houver, com aviso) + "Ver como tabela"; variação vs mês anterior; Início com o resumo do mês; transações filtráveis por categoria/período; teste de reconciliação (soma das categorias = total exibido, excluindo transferência/fatura).
 - **Dependências:** E-16, E-10 (privacidade, mês financeiro).
 - **Plataformas:** = (SQL nativo × WASM; meta medida nos dois).
@@ -377,6 +423,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 ### E-20 — Contas a pagar: recorrência e instâncias (core + banco)
 - **Sprint:** 5 · **PBIs:** A-01. D-031.
 - **Objetivo:** o núcleo gera corretamente as ocorrências e estados de qualquer conta recorrente.
+- **Porte (D-045):** `services/recurrence/{rrule,dates,generate}.ts` e `bills/{types,repo,service}.ts` → core + módulo `bills`; conferir contra o D-031.
 - **Escopo:** core `recurrence`: única, semanal, mensal (dia N; inexistente → último dia), anual, último dia útil (seg–sex, sem feriados), a cada N semanas/meses; estados a vencer / vence hoje / vencida / paga calculados pela data; migração 005 `bill_template`, `bill_instance`; geração das instâncias dos próximos 90 dias ao abrir e após alterações (idempotente); validação de linha digitável (dígitos verificadores) e Pix copia-e-cola no core.
 - **Dependências:** E-06, E-14 (para o vínculo na E-21).
 - **Plataformas:** = (core + banco).
@@ -388,6 +435,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 ### E-21 — Contas a pagar: telas, pagar e vincular ao extrato
 - **Sprint:** 5 · **PBIs:** A-01.
 - **Objetivo:** cadastrar, ver e pagar contas, com vínculo à transação do extrato.
+- **Porte (D-045):** telas `bills/new`, `bills/[id]` e aba `bills` como referência.
 - **Escopo:** telas UX nº 17–19 (abas A vencer / Vencidas / Pagas; nova/editar com `MoneyField`, "valor varia", recorrência, categoria, forma de pagamento, observação, linha digitável com Colar/Copiar); "Paguei" com toast Desfazer; ao pagar, sugere transação correspondente (data/valor próximos) com confirmação; evento `bill.paid` (cancela lembretes na E-23).
 - **Dependências:** E-20.
 - **Critérios de aceite (A-01):** (1) campos do PBI; (2) estados com ícone + texto + cor; (3) pagar registra a data e oferece vínculo quando houver transação; (4) pagar publica o evento que cancela lembretes pendentes (verificado na E-23).
@@ -398,6 +446,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 ### E-22 — Confiabilidade dos alertas (Android) + prova da estratégia do iPhone
 - **Sprint:** 5 · **PBIs:** A-03; D-001 (prova do `.ics` e Badging = M-1b, parte 1).
 - **Objetivo:** no Android, o usuário sabe se os lembretes vão tocar; no iPhone, fica provado que o `.ics` com alarmes funciona.
+- **Porte (D-045):** `services/diagnostics/alerts.ts`, `notifications/native.ts` → base do adaptador `notifications.native.ts` (conferir a API do SDK 58).
 - **Escopo:** porta `notifications` (verificar a lib atual de notificações locais do Expo SDK 58: permissões, canais, alarmes exatos, reboot; avisar dependência); canais `bills`, `subscriptions`, `backup`; pedir permissão no primeiro uso do módulo, depois de explicar; orientar alarmes exatos (Android 12+) e bateria por fabricante (ColorOS primeiro, depois Samsung, Xiaomi, Motorola); tela **"Meus alertas estão funcionando?"** com checklist e "notificação de teste em 1 minuto"; aviso no Início se permissão revogada; opção "ocultar valores na tela bloqueada" (padrão: só nome e data); **iPhone:** gerador `.ics` no core (UID determinístico, `SEQUENCE`, `VALARM`) + tela **"Lembretes no iPhone"** + teste do Badging API; resultado em D-001/matriz.
 - **Dependências:** E-21.
 - **Plataformas:** Android = permissões/diagnóstico completos · iPhone/PWA = ✕ notificações → tela explicativa + `.ics` (D-001). Portas: `notifications`, `calendar-export`, `badge`.
@@ -414,6 +463,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 ### E-23 — Motor de lembretes no Android (início do M-1a)
 - **Sprint:** 6 · **PBIs:** A-04; F-06 (lembrete mensal de backup); C-01 (aviso de conclusão em 2º plano, se mantido).
 - **Objetivo:** lembretes de contas tocam no horário com o app fechado, sem duplicar, e são reconstruídos sempre que algo muda.
+- **Porte (D-045):** `notifications/{plan,reminders,scheduler,backup-reminder}.ts` → core (plano, ids) + módulo; inclui as alterações sem commit da árvore de trabalho congelada.
 - **Escopo:** core: regras (padrão 3/1/0 dias às 9h; silêncio 22h–7h; atraso 1×/dia por 3 dias; máx. 5/dia → resumo; digest opcional), janela rolante de 60 dias, id determinístico; migração `notification_schedule`; reagendar ao abrir, ao criar/editar/pagar, em `transaction.imported`, após reboot e em `backup.restored` (idempotente); texto padrão só nome e data (valor e linha digitável conforme A-03); lembrete de backup dia 1 às 20h; tela **Regras de lembrete** por conta.
 - **Dependências:** E-22.
 - **Plataformas:** Android = notificações locais · iPhone/PWA = as mesmas regras alimentam a faixa e o `.ics` (E-24).
@@ -438,6 +488,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 ### E-25 — Ações rápidas na notificação
 - **Sprint:** 6 · **PBIs:** A-05 (2º na ordem de corte).
 - **Objetivo:** "Paguei" ou "Lembrar amanhã" direto da notificação, sem efeito duplicado.
+- **Porte (D-045):** `notifications/actions.ts` → módulo `bills` + adaptador.
 - **Escopo:** categorias de ação na porta `notifications`; o app confere o estado no banco antes de aplicar; abrir o app pelo toque.
 - **Dependências:** E-23.
 - **Plataformas:** Android = ações na notificação · iPhone/PWA = ✕ → ações na faixa/lista (E-24).
@@ -662,7 +713,9 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 | 1 | E-02 sem iPhone real | Trava E-03 (web) e toda a cadeia de cripto | Agendar o iPhone antes; se atrasar, a E-03 começa pelo adaptador nativo + fake e só fecha o web depois |
 | 2 | KDF lenta demais no Hermes | E-04/E-05 mudam | Medida já na E-02; PBKDF2 como plano B |
 | 3 | Sem CSVs anonimizados na hora do Sprint 3 | E-12..E-19 param | Script de anonimização entregue na E-12; o Kaynan exporta durante o Sprint 2 |
-| 4 | Critérios antigos de C-01..C-06 ausentes | Retrabalho na Importação | Pergunta §17; até lá, BRD §5.2 + tabela do backlog como contrato |
+| 4 | Critérios antigos de C-01..C-06 ausentes | Retrabalho na Importação | Contrato = BRD §5.2 + tabela do backlog + comportamento do código antigo (caracterização); divergência vira pergunta |
+| 4b | Código antigo traz decisões incompatíveis (backup com `.db` cru, ML, categorias, só Android) | Porte "literal" quebra D-008/D-030/paridade | Triagem do §0.4: decisões vigentes prevalecem; nada entra sem teste |
+| 4c | SDK 57 → 58 e Hermes/web | APIs do código antigo mudaram ou não existem no web | Conferir a doc atual em cada porte; adaptador web sempre novo |
 | 5 | 2º fabricante Android tarde | M-1a (14 dias) atrasa o beta | Pedir o aparelho já no Sprint 5; o M-1a corre em paralelo às etapas 26+ |
 | 6 | Mudança de esquema depois de backups reais | Restauração quebra | `schemaVersion` + migração testada em toda etapa com migração (vetor de backup antigo restaurando) |
 | 7 | Etapas grandes (E-04, E-05, E-23) | Estouram a sessão | Divisões a/b já previstas |
@@ -692,9 +745,9 @@ Todas as etapas: **[ ] pendente**. Próxima: **E-01**, aguardando "Start" (3B).
 ## 17. Perguntas em aberto (impedem alguma etapa)
 | # | Pergunta | Bloqueia |
 |---|---|---|
-| 1 | Confirma a reinterpretação da E-06 (reescrita da base do núcleo, não "porte"; golden de banco na Importação)? O pedido fala em "porte do núcleo existente", mas o D-036 diz que o código não existe. | E-06 |
-| 2 | O backlog diz que os critérios de aceite antigos de C-01..C-06 "continuam válidos", mas o backlog de 14/10 não está no repositório. Você tem esse documento? Se não, aceita BRD §5.2 + tabela do backlog como contrato? | E-12..E-19 |
-| 3 | Quais bancos você usa (para os 2–3 primeiros perfis) e quando consegue exportar os CSVs? Quem fornece os demais bancos? | E-12, E-13, E-19 |
+| ~~1~~ | ~~Porte × reescrita da E-06~~ → **resolvida**: porte com triagem (D-045). | — |
+| 2 | Se você ainda tiver o backlog de 14/10 (critérios de C-01..C-06), ele ajuda; sem ele, o contrato é BRD §5.2 + backlog + comportamento do código antigo. **Não bloqueia mais.** | — |
+| 3 | Quais bancos você usa (para os primeiros golden files) e quando consegue exportar os CSVs? Quem fornece C6 e Santander? Os perfis antigos (Nubank, Itaú, Bradesco, BB, Caixa, Inter) foram feitos a partir de extratos reais? | E-12, E-13, E-19 |
 | 4 | Qual iPhone (modelo e iOS) estará disponível para medir na E-02, e quando? E o 2º fabricante Android para o M-1a? | E-02 (conclusão), M-1a |
 | 5 | Aprova os desvios do §0.1: SW/offline no Sprint 2 (E-07), Playwright já na E-03, página de bancada descartável publicada em preview `spike/*` na E-02, rota de autoteste em builds de debug/preview? | E-02, E-03, E-07 |
 | 6 | Curva da espera crescente do PIN (proposta: 30 s, 1 min, 2 min, 5 min, 15 min de teto)? | E-04 |

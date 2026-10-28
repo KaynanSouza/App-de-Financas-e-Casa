@@ -201,7 +201,7 @@ Relógio simulado e mudança de fuso; reagendar 2× = mesmo conjunto; 14 dias em
 Técnicas: índices em `txn(posted_on)`, `txn(category_id, posted_on)`, `txn(dedupe_key)`; agregações em SQL; parsing em blocos (Web Worker no web, fatias no nativo); listas virtualizadas.
 
 ## 7. Testes
-Pirâmide da skill `testing-strategy`: unit em `src/core` (maioria) · golden files de CSV anonimizados (D-036) · contrato de portas com fakes · integração SQLite (nativo em aparelho; web com Playwright) · backup ida e volta + vetores fixos cruzados · relógio simulado/fusos · e2e web (Playwright + axe, sprint do PWA) · roteiro manual por sprint (TalkBack/VoiceOver, 2 fabricantes Android, iPhone 18/26). CI: `tsc`, `jest`, `expo-doctor`, export web, "sem URL externa" (D-042).
+Pirâmide da skill `testing-strategy`: unit em `src/core` (maioria) · golden files de CSV anonimizados (D-036/D-045) · testes de caracterização do código portado (D-045) · contrato de portas com fakes · integração SQLite (nativo em aparelho; web com Playwright) · backup ida e volta + vetores fixos cruzados · relógio simulado/fusos · e2e web (Playwright + axe, sprint do PWA) · roteiro manual por sprint (TalkBack/VoiceOver, 2 fabricantes Android, iPhone 18/26). CI: `tsc`, `jest`, `expo-doctor`, export web, "sem URL externa" (D-042).
 
 ## 8. Build Android
 - `npx expo prebuild -p android` (pasta `android/` gerada, fora do git) + `gradlew`.

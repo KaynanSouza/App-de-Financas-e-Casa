@@ -7,8 +7,8 @@ Uma única fonte de verdade, **privada**, para o dinheiro e a rotina da casa. O 
 **Quem usa:** o autor e 3–5 amigos/familiares, maioria Android, perfil misto (jovens e familiares mais velhos), com necessidades de **fonte ampliada** e **daltonismo/baixa visão** (D-009). Cada pessoa instala no próprio celular e tem os próprios dados: não existe conta, lar nem servidor. Sem cobrança, custo zero (D-043).
 
 ## Escopo do MVP (BRD §4)
-- **Fundação:** bloqueio PIN/biometria (F-01), banco criptografado (F-03), exportar/apagar (F-04), log local (F-05), backup em formato único Android ↔ iPhone (F-06), núcleo local **reescrito** (F-07, D-036).
-- **Importação (reescrita, D-036):** CSV de Nubank, C6, Santander, BB, Itaú e Bradesco; perfis; dedupe; categorização; correção com aprendizado; dashboard (C-01..C-06).
+- **Fundação:** bloqueio PIN/biometria (F-01), banco criptografado (F-03), exportar/apagar (F-04), log local (F-05), backup em formato único Android ↔ iPhone (F-06), núcleo local **portado do código antigo com triagem** (F-07, D-045).
+- **Importação (portada do `dia-a-dia`, D-045):** CSV de Nubank, C6, Santander, BB, Itaú e Bradesco; perfis; dedupe; categorização; correção com aprendizado; dashboard (C-01..C-06).
 - **Contas e alertas:** A-01, A-03, A-04, A-05 (Android); faixa no app + `.ics` no iPhone (D-001).
 - **Assinaturas:** S-01..S-04, cotação manual (D-032).
 - **Compras:** L-01..L-05, L-08.

@@ -16,7 +16,7 @@
 | F-04 Exportar/apagar | JSON+CSV pelo Compartilhar; apagar (PIN + "APAGAR") banco, chave, notificações, temporários, preferências | JSON+CSV por Web Share (com arquivos) ou download; apagar OPFS, chaves, caches e registro do SW, storage | = ? | Web Share no modo standalone: testar (D-035) |
 | F-05 Log local | `event_log` no banco; compartilhar log | Igual | = | — |
 | F-06 Backup | Formato único (D-008); salvar pelo Compartilhar; lembrete **mensal** (dia 1, 20h) por notificação | Formato único; Web Share/download; abrir por seletor; lembrete **semanal** dentro do app; instalação obrigatória + `persist()` | ≈ | Restauração cruzada nos dois sentidos; KDF no E-02 (D-039) |
-| F-07 Núcleo (reescrita) | Core TS rodando no app | Mesmo core | = | Reescrita, sem porte (D-036) |
+| F-07 Núcleo (porte) | Core TS rodando no app | Mesmo core | = | Porte com triagem do `dia-a-dia` (D-045); o código antigo era só Android: toda parte de plataforma ganha adaptador web |
 | F-08 Onboarding e ajuda | 4 passos; PIN + biometria; lembrete de backup mensal; ajuda para instalar o APK | Passo 0 "Instalar na Tela de Início" (bloqueia até instalar); PIN; backup semanal | ≈ | D-002, D-023, D-044 |
 | C-01 Importar CSV | Seletor do sistema + "Abrir com"; parsing em fatias (sem Web Worker); notificação ao concluir em 2º plano | Só seletor dentro do app; parsing em Web Worker; sem aviso em 2º plano (a tela mostra o progresso) | ≈ | Limite 10 MB / 50 mil linhas: medir memória no iPhone |
 | C-02..C-05 Perfis, dedupe, regras, correção | Core | Core | = | Perfis novos: APK novo × deploy; 6 bancos (D-030) |

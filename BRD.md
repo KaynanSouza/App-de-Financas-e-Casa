@@ -35,7 +35,7 @@ Beta com 3–5 pessoas, **maioria Android**, perfil misto. Sem conta: cada pesso
 - R3: cupom fiscal em ≥ 3 estados (**só Android**; inviável no PWA, ver matriz).
 
 ## 4. Escopo por release
-Legenda de situação: **Novo** · **Refazer/Adaptar** (backlog) · **Reescrever** (D-036: o código dos Épicos 1 e 2 não existe mais).
+Legenda de situação: **Novo** · **Refazer/Adaptar** (backlog) · **Portar** (D-045: código antigo do `dia-a-dia` portado com triagem para `src/core` + portas; substitui D-036).
 
 ### 4.1 MVP
 | ID | PBI | Prioridade | Situação | Observações |
@@ -46,17 +46,17 @@ Legenda de situação: **Novo** · **Refazer/Adaptar** (backlog) · **Reescrever
 | F-05 | Log local de diagnóstico | Should | Adaptar | Pode virar mínimo (D-013) |
 | F-06 | Backup criptografado e restauração | Must | Novo | Formato único Android ↔ iPhone (D-008) |
 | F-08 | **Onboarding e ajuda** (novo, D-044) | Must | Novo | Instalação no iPhone, onboarding em 4 passos (D-023), ajuda de instalar o APK e de exportar o CSV de cada banco; nunca cortar |
-| F-07 | Núcleo local (antes "porte") | Must | **Reescrever** | `src/core` em TS puro; golden files de CSVs anonimizados (D-036) |
-| C-01 | Importação de CSV com detecção de formato | Must | **Reescrever** | 6 bancos (D-030) |
-| C-02 | Mapeamento de colunas e perfis de banco | Must | **Reescrever** | |
-| C-03 | Deduplicação e idempotência | Must | **Reescrever** | |
-| C-04 | Categorização por regras e dicionário | Must | **Reescrever** | Dicionário montado do zero |
-| C-05 | Correção manual com aprendizado | Must | **Reescrever** | |
-| C-06 | Dashboard por categoria e período | Must | **Reescrever** | Gráficos próprios (D-021) |
-| A-01 | Contas a pagar e recorrência | Must | A fazer | D-031 |
+| F-07 | Porte do núcleo (com triagem) | Must | **Portar** | `src/core` em TS puro + adaptadores; testes escritos no porte; golden files de CSVs anonimizados (D-045) |
+| C-01 | Importação de CSV com detecção de formato | Must | **Portar** | 6 bancos (D-030); Caixa e Inter como extras (D-045) |
+| C-02 | Mapeamento de colunas e perfis de banco | Must | **Portar** | |
+| C-03 | Deduplicação e idempotência | Must | **Portar** | |
+| C-04 | Categorização por regras e dicionário | Must | **Portar** | Dicionário antigo como base; categorias ajustadas ao D-030; ML fica para C-07 (R2) |
+| C-05 | Correção manual com aprendizado | Must | **Portar** | |
+| C-06 | Dashboard por categoria e período | Must | **Portar** | Gráficos próprios (D-021) |
+| A-01 | Contas a pagar e recorrência | Must | Portar (parcial) | D-031; base em `dia-a-dia` (D-045) |
 | A-03 | Permissões e confiabilidade dos alertas | Must | A fazer | Android; no iPhone, tela "Lembretes no iPhone" (D-001) |
-| A-04 | Motor de lembretes locais | Must | A fazer | Android: notificações; iPhone: faixa + `.ics` (D-001) |
-| A-05 | Ações rápidas na notificação | Should | A fazer | Só Android (D-005) |
+| A-04 | Motor de lembretes locais | Must | Portar (parcial) | Android: notificações (base em `dia-a-dia`, D-045); iPhone: faixa + `.ics` (D-001) |
+| A-05 | Ações rápidas na notificação | Should | Portar (parcial) | Só Android (D-005) |
 | S-01 | Cadastro manual de assinaturas | Must | A fazer | Cotação manual (D-032) |
 | S-02 | Detecção de assinaturas no CSV | Should | A fazer | |
 | S-03 | Dashboard de custo mensal/anual | Must | A fazer | |
@@ -146,7 +146,7 @@ Servidor de dados, conta/login/2FA, lar e convites, sincronização automática 
 |---|---|---|
 | **Perda de dados** (celular perdido; iOS apaga o PWA) — prioritário para o Kaynan | Perda total | Backup único (F-06), lembretes mensal/semanal, instalação obrigatória + `persist()` no iPhone, restauração cruzada testada |
 | **Amigos não conseguem instalar/usar** — prioritário | Falha do critério de sucesso | Onboarding guiado (D-023), tutorial de APK e Tela de Início, teste com 1 familiar antes do beta, acessibilidade (D-027) |
-| Prazo: reescrita dos Épicos 1 e 2 com ≤ 5 h/semana | MVP muito longo | Medir velocidade no Sprint 1; ordem de corte D-013 |
+| Prazo: porte dos Épicos 1–3 (sem testes, SDK 57, só Android) com ≤ 5 h/semana | MVP muito longo | Medir velocidade no Sprint 1; ordem de corte D-013 |
 | Android mata alarmes (ColorOS etc.) | Lembrete não toca | A-03, reagendar ao abrir, teste de 14 dias em 2 fabricantes |
 | iPhone sem notificação local | Usuário iPhone perde vencimento | Faixa no app + `.ics`; comunicar a limitação no onboarding |
 | Criptografia/KDF no web indefinida | Atraso/insegurança | Spike E-02 antes do Sprint 1 |
@@ -158,7 +158,7 @@ Servidor de dados, conta/login/2FA, lar e convites, sincronização automática 
 
 ## 8. Premissas
 - Cada usuário tem um único aparelho principal; Android ≥ 10, iOS ≥ 18 (D-040).
-- O Kaynan fornece CSVs reais dos seus bancos e anonimiza com o script local; amigos ajudam para os demais bancos (D-036).
+- O Kaynan fornece CSVs reais dos seus bancos e anonimiza com o script local; amigos ajudam para os demais bancos (D-036, mantido pela D-045).
 - O Cloudflare Pages (gratuito) continua disponível para o PWA; o código do front pode ser público (D-006).
 - Distribuição do APK e avisos de atualização são feitos manualmente pelo Kaynan (D-007).
 - Custo zero (D-043).

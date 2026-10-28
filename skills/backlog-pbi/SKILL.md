@@ -16,7 +16,7 @@ Transformar um PBI do backlog em tarefas pequenas e verificáveis, sem inventar 
 
 ## Passo a passo
 1. **Ler o PBI inteiro:** descrição, critérios de aceite, notas técnicas, dependências.
-2. **Reinterpretar:** onde o PBI citar Capacitor, plugin, WebView, IndexedDB proibido, Keystore ou notificação local, tratar como **intenção**; achar o item correspondente em `DECISIONS.md`. Atenção: C-01..C-06 aparecem como "Concluído (portar)" no backlog, mas são **reescrita** (D-036); **F-08 Onboarding e ajuda** é PBI novo (D-044). O escopo vigente está no `BRD.md` §4.
+2. **Reinterpretar:** onde o PBI citar Capacitor, plugin, WebView, IndexedDB proibido, Keystore ou notificação local, tratar como **intenção**; achar o item correspondente em `DECISIONS.md`. Atenção: C-01..C-06 aparecem como "Concluído (portar)" no backlog, mas são **porte com triagem** do `dia-a-dia` (D-045, substitui D-036); **F-08 Onboarding e ajuda** é PBI novo (D-044). O escopo vigente está no `BRD.md` §4.
 3. **Checar dependências** do PBI: estão prontas? Se não, parar e avisar.
 4. **Listar lacunas e contradições** e **perguntar** ao Kaynan antes de codar. Nunca preencher requisito por conta própria.
 5. **Declarar a paridade:** para cada critério, o comportamento no Android e no iPhone/PWA; se faltar capacidade, propor a degradação e **avisar**.
@@ -46,7 +46,8 @@ Transformar um PBI do backlog em tarefas pequenas e verificáveis, sem inventar 
 
 ## Armadilhas
 - Antes de iniciar uma etapa, ler o bloco dela no `PLAN.md` (escopo, dependências, critérios, testes, demonstração) e as perguntas abertas do §17; a etapa só começa com o "Start" do Kaynan.
-- Os critérios de aceite de C-01..C-06 não estão no backlog atual ("continuam válidos" do backlog de 14/10, ausente no repo): usar BRD §5.2 até o Kaynan responder (PLAN §17).
+- Os critérios de aceite de C-01..C-06 não estão no backlog atual ("continuam válidos" do backlog de 14/10, ausente no repo): o contrato é BRD §5.2 + backlog + comportamento do código antigo `../dia-a-dia` (D-045), fixado por testes de caracterização antes de portar.
+- Porte (D-045): o `dia-a-dia` é só leitura e não tem testes; escrever o teste antes de copiar, adaptar às portas e citar `Ported-from:` no commit. Decisões vigentes (D-008, D-030, paridade) prevalecem sobre o código antigo.
 - Tratar a nota técnica do backlog como instrução literal (ex.: "Web Worker" no nativo, "plugin do Capacitor").
 - Esquecer as dependências críticas: F-07/F-03 bloqueiam tudo; C-03 bloqueia S-02/A-02/L-04; os UUIDs de L-01 precisam existir desde o início.
 - Fazer dois PBIs de uma vez.
