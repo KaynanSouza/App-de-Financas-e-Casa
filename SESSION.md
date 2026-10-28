@@ -3,7 +3,7 @@
 **Atualizado em:** 28/10/2026
 
 ## Fase atual
-FASE 1 — SETUP · etapa "Verificação do Ambiente" (Prompt 1B) — **concluída, aguardando aprovação**.
+FASE 1 — SETUP · etapa "Verificação do Ambiente" (Prompt 1B) — **concluída e APROVADA pelo Kaynan em 28/10/2026**.
 
 ## Última ação
 - Ambiente verificado executando comandos (detalhes em `docs/PROVA-DE-VIDA.md`): Node 24.16.0, npm 12.0.2, JDK 17 (Temurin), Android SDK (platforms 36/37, build-tools 36, NDK 27, **CMake 4.1.2** instalado pelo Kaynan), `expo-doctor` 20/20, wrangler 4.154.0 (devDependency).
@@ -17,7 +17,7 @@ FASE 1 — SETUP · etapa "Verificação do Ambiente" (Prompt 1B) — **concluí
 - Código descartável removido: rota `proto-sqlite`, `metro.config.js`, dependência `expo-sqlite`, `android/`, `dist/`, app de prova desinstalado do OPPO.
 
 ## Próximo passo
-Próxima etapa a definir pelo Kaynan. Candidatos: autorizar o preview no Pages (login `npx wrangler login` feito por ele) para testar no iPhone; aprovar o runner de testes (ADR-008).
+Aguardando o prompt da próxima etapa. As decisões pendentes abaixo NÃO foram aprovadas junto com a etapa. Candidatos: autorizar o preview no Pages (login `npx wrangler login` feito por ele) para testar no iPhone; aprovar o runner de testes (ADR-008).
 
 ## Bloqueios
 - Preview no Cloudflare depende de autorização e de login do Kaynan.
