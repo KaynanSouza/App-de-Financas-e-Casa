@@ -24,6 +24,7 @@
     "react-native-reanimated": "4.7.1",
     "react-native-safe-area-context": "~5.10.1",
     "react-native-screens": "~4.30.0",
+    "react-native-svg": "15.16.0",
     "react-native-web": "~0.21.4",
     "react-native-worklets": "0.13.0"
   },
@@ -42,7 +43,12 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "test": "jest",
-    "test:watch": "jest --watchAll"
+    "test:watch": "jest --watchAll",
+    "typecheck": "tsc --noEmit",
+    "build:web": "expo export --platform web",
+    "check:urls": "node scripts/check-no-external-urls.mjs",
+    "serve:web": "wrangler pages dev dist --port 8788 --compatibility-date=2026-10-23",
+    "android:debug": "node scripts/android-debug.mjs"
   },
   "private": true,
   "jest": {

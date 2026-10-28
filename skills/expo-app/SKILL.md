@@ -54,6 +54,14 @@ Manter o app Expo (React Native + TypeScript + Expo Router) funcionando igual no
 - Encerrar processos que você iniciou: `TaskStop` às vezes deixa o `node` (Metro) e o `workerd` vivos e segurando a porta. Matar pelo PID **conferindo a linha de comando**.
 - O npm 12 bloqueia `postinstall` (ex.: `workerd`); avaliar antes de aprovar.
 
+## Armadilhas reais (E-01, 28/10/2026)
+- **RN Web + `web.output: "static"`:** a 1ª atualização de estilo depois da hidratação não chega aos elementos vindos do HTML pré-renderizado (o tema ficava pela metade). Correção: remontar a árvore uma vez após a hidratação no web (`src/app/_layout.tsx`). Não é o React Compiler (testado desligado).
+- **Expo Router 58 embute o React Navigation:** `Tabs`, `ThemeProvider`, `DarkTheme`, `DefaultTheme` vêm de `expo-router` (não há `@react-navigation/*` no `node_modules`). Sem o `ThemeProvider` de navegação, barra de abas e fundos ignoram o nosso tema.
+- **`tabBarStyle.height: 'auto'` no Android (edge-to-edge)** empurra a barra de abas para baixo da barra de gestos. Não fixar altura; usar `tabBarItemStyle.minHeight`. Em tela larga, forçar `tabBarLabelPosition: 'below-icon'`.
+- **Build:** `npm run android:debug -- --install` (prebuild + Gradle arm64 + adb). O plugin `plugins/with-android-local-properties.js` escreve `sdk.dir`/`cmake.dir` a cada prebuild. No Git Bash, o `cmd` não acha `gradlew.bat` na pasta atual: chamar pelo caminho absoluto. Build limpo ≈ 3,5 min; APK debug ≈ 90 MB.
+- **Ícones:** `expo-symbols` (Android/web) carrega um TTF local de 972 KB (Material Symbols): pesado para o PWA. Usamos ícones SVG próprios (`src/ui/components/Icon.tsx`, `react-native-svg` 15.16.0, MIT).
+- **`check:urls`:** o bundle web contém `github.com`/`docs.expo.dev` só em mensagens de erro das libs (lista de permitidos documentada no script); a defesa real é a CSP `connect-src 'self'` (E-07).
+
 ## Exemplo mínimo (nova rota)
 ```tsx
 // src/app/settings.tsx — só UI; regras vêm de src/modules/src/core

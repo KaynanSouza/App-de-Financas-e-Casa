@@ -120,7 +120,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 - **UX/a11y/segurança:** abas com ícone + rótulo; rótulos a 200% (D-018, risco conhecido); foco visível no web; nenhuma URL externa; `noindex` no preview.
 - **Demonstração:** APK: 5 abas, tema claro/escuro seguindo o sistema, troca manual em Mais. URL: as mesmas 5 abas no iPhone, coluna centralizada no desktop.
 - **Riscos / plano B:** MAX_PATH/CMake no Windows → script com caminho curto + doc em `PROVA-DE-VIDA.md`; abas a 200% não cabem → só ícone visível + rótulo acessível (testado).
-- **Status:** [ ] pendente
+- **Status:** [~] implementada em 28/10/2026 (branch `feat/e-01-skeleton`), aguardando aprovação do Kaynan.
 
 ### E-02 — SPIKE: criptografia do banco no web e KDF
 - **Sprint:** 0 · **PBIs:** F-03 (estratégia web), F-01/F-06 (KDF). Decisões D-004, D-039.
@@ -768,7 +768,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 | 8 | S-01/S-03/S-04 | E-26..E-28 saem |
 
 ## 16. Status
-Plano aprovado em 28/10/2026 ("Start"). **E-01 em andamento.** Demais etapas: [ ] pendente.
+Plano aprovado em 28/10/2026 ("Start"). **E-01 implementada, aguardando aprovação.** Demais etapas: [ ] pendente.
 
 ## 17. Perguntas em aberto (impedem alguma etapa)
 | # | Pergunta | Bloqueia |

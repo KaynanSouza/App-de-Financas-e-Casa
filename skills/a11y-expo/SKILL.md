@@ -32,6 +32,7 @@ Toda tela utilizável com **TalkBack** (Android) e **VoiceOver** (Safari/iPhone)
 - [ ] Testes com `@testing-library/react-native` usando `getByRole`/`getByLabelText` (instalar só com aprovação; ver `testing-strategy`).
 
 ## Armadilhas
+- **RN Web 0.21 ignora `accessibilityState`/`accessibilityRole` para gerar `aria-checked` etc.** (verificado na E-01: rádio sem `aria-checked`). Usar as props `role` + `aria-label`/`aria-checked`/`aria-disabled`/`aria-hidden`, que o RN 0.88 também entende no nativo. `accessibilityHint` não tem equivalente `aria-*`: manter.
 - `TouchableOpacity`/`Pressable` sem `accessibilityRole="button"`.
 - Ícone sem rótulo ("botão" mudo).
 - Rótulo repetindo o papel ("botão salvar botão").

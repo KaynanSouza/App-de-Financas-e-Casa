@@ -4,29 +4,36 @@
 
 ## Fase atual
 **Fase 3 (Codificação) — `PLAN.md` v1.3 aprovado em 28/10/2026.**
-**Em andamento: E-01** (esqueleto, design system mínimo, navegação, tema, pipeline).
+**E-01 implementada (branch `feat/e-01-skeleton`), aguardando aprovação do Kaynan.**
 
-## Última ação
-- Passo "Divisão em Etapas": `PLAN.md` v1.1 com **40 etapas** (E-01..E-40) em 11 sprints, marcos de aparelho real (M-0..M-4), matriz PBI × Etapa (todo o MVP coberto), riscos de sequência e ordem de corte D-013 mapeada para etapas.
-- **Código antigo encontrado** em `../dia-a-dia` (Expo SDK 57, TS, ~11,2 mil linhas, Épicos 1–2 e parte do 3, sem testes). O Kaynan delegou a escolha → **D-045: porte com triagem** (substitui D-036): lógica pura → `src/core` com testes de caracterização; plataforma → adaptadores; telas só referência; backup antigo (`.db` cru) e ML ficam de fora; bancos do D-030 + Caixa/Inter extras; `dia-a-dia` congelado e só leitura (`e59f1a1` + árvore de trabalho de 28/10). BRD, CONTEXT, TRD, matriz e skills atualizados; ADRs do spike renumerados para D-046/D-047.
-- Desvios propostos (PLAN §0.1, a aprovar): E-06 = inventário e porte (D-045); service worker/offline no Sprint 2 (E-07); Playwright já na E-03; bancada descartável em preview `spike/*` na E-02; rota `/dev/selftest` em builds de debug/preview; perguntas restantes do spike distribuídas pelas etapas que dependem delas.
-- Respostas do Kaynan (28/10): bancos = os 6 perfis antigos → **D-048** (Nubank, Itaú, Bradesco, BB, Caixa, Inter; C6/Santander só por mapeamento manual); curva do PIN aceita (D-029); **só o OPPO** para testes → **D-049 proposta** (WebKit + fila do iPhone + janelas J-1..J-3 com iPhone emprestado; 2º fabricante no beta); lançamento manual avaliado → **D-050 proposta** (C-08 Should, E-17b). Inventário ganhou 13 arquivos não versionados do Épico 4 (Assinaturas) do `dia-a-dia`. PLAN v1.2.
-- Kaynan (28/10): sem iPhone → validação adiada, PWA experimental no beta (D-049 aceita com ajuste); lançamento manual incluído (C-08, D-050 aceita); "Start" = plano e desvios aprovados.
-- Nenhum código de produto escrito até aqui.
+## Última ação (E-01 — esqueleto, design system mínimo, navegação, tema, pipeline)
+- Tokens (`src/ui/theme`: cores D-016 + borda `#7D858F`/`#737B85` ≥ 3:1, tipografia, espaçamento, alvo 48), tema automático + manual (em memória até a E-10), componentes `AppText`, `Button`, `IconButton`, `Card`, `Banner`, `EmptyState`, `ChoiceGroup`, `Screen`, `Icon` (SVG próprio).
+- 5 abas (Início · Gastos · Contas · Compras · Mais) com ícone + rótulo + indicador; coluna de 480 px no web; tema de navegação derivado dos tokens.
+- Pipeline: config plugin `with-android-local-properties` (sdk.dir/cmake.dir reproduzíveis), `npm run android:debug`, `build:web`, `check:urls`, `serve:web`, `typecheck`; README com o passo a passo.
+- Testes: contraste WCAG dos tokens nos 2 temas, fronteiras de arquitetura (core puro; pacotes de plataforma só em `src/platform`; módulos sem import cruzado).
+- Dependência nova: `react-native-svg` 15.16.0 (MIT; já prevista no D-021, antecipada para os ícones em vez da fonte de 972 KB do `expo-symbols`).
+- Correções achadas no teste real: tema ficava pela metade após a hidratação do HTML estático (remontagem única no web); `aria-checked` ausente no web (migração para `role`/`aria-*`); barra de abas escondida pela barra de gestos no Android (`height: 'auto'` removido). Lições em `skills/expo-app` e `skills/a11y-expo`.
+- Kaynan (28/10): sem iPhone → validação adiada, PWA experimental no beta (D-049); lançamento manual incluído (C-08, D-050).
+
+## Testado
+- `npm test` (27 testes, verde), `tsc --noEmit` (0 erros), `expo-doctor` 20/20, `expo export -p web` + `check:urls` OK.
+- Web (Chrome desktop, `wrangler pages dev`): 5 abas com nome e `aria-selected`; grupo "Tema" com `aria-checked`; troca de tema no 1º toque; coluna centralizada.
+- Android (OPPO CPH2699, Android 16): APK de debug compilado do zero pelo script (3 min 38 s, 90 MB), instalado e aberto; tema escuro automático; barra de abas visível acima da barra de gestos.
+
+## Não testado
+- **Android:** TalkBack; fonte do sistema em 200% (configuração do aparelho: fica para o Kaynan); tema claro no aparelho.
+- **iPhone/PWA:** nada em iPhone real (fila `docs/testes/fila-iphone.md`, itens 1–4). Playwright/WebKit entra na E-03.
 
 ## Próximo passo
-Aprovação do `PLAN.md` pelo Kaynan → "Start" da **E-01** (esqueleto, design system mínimo, navegação, tema, APK de debug + preview no iPhone).
+Aprovação da E-01 pelo Kaynan → merge na `main` → E-02 (spike de criptografia web + KDF).
 
 ## Bloqueios
-- Nenhum para a E-01. CSVs anonimizados dos 6 bancos necessários antes do Sprint 3. Validação no iPhone sem data (fila em `docs/testes/fila-iphone.md`, a criar na 1ª etapa com item de iPhone).
+- Nenhum para a E-02. CSVs anonimizados dos 6 bancos necessários antes do Sprint 3.
 
 ## Decisões provisórias / em aberto
 1. E-02: D-004 (cifra web), D-039 (KDF) → viram D-046/D-047 (`@noble/hashes` do código antigo é candidata forte). D-038 (Intl/Hermes) → E-06. D-033 (EAN no iPhone) → E-33. `.ics`/Badging → E-22. D-003 (passkey) → R2.
 2. Feriados no "dia útil" → R2 (D-031). Data do beta → **M-0** (fim da E-11) (D-043).
 3. Antes da produção: Pages clássico × Workers (ADR-006) → E-39.
-4. E-01: `cmake.dir` reproduzível, teste de fronteira de imports, ícones das abas (`react-native-svg` antecipado × glifos), dependências extras do template e as 8 vulnerabilidades do `npm audit` (propor; remover só com OK). `allowBackup=false` → E-03.
+4. **Proposta a decidir:** remover dependências do template sem uso no código (`@expo/ui`, `expo-glass-effect`, `expo-symbols`, `expo-image`, `expo-device`, `expo-web-browser`, `expo-constants`, `expo-font`, `react-native-gesture-handler`, `react-native-reanimated`, `react-native-worklets`); `npm audit --omit=dev`: 8 vulnerabilidades (5 baixas, 3 altas) a analisar. Só com OK do Kaynan.
 5. Script local de anonimização de CSV → E-12.
-6. Idioma das mensagens de commit: descrição em inglês (AGENTS §1), exceto mensagem ditada literalmente pelo Kaynan (skill `git-versionamento`).
-
-## Não testado
-- Nada de código de produto nesta fase. Afirmações "?" da matriz dependem do E-02 e de aparelhos reais (iPhone com iOS 18 e 26, segundo fabricante Android).
+6. Idioma das mensagens de commit: descrição em inglês (AGENTS §1), exceto mensagem ditada literalmente pelo Kaynan.
