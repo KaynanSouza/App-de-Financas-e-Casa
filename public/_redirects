@@ -1,0 +1,4 @@
+# Sem regras de propósito (Fase 1, verificado com wrangler 4.154.0):
+# - "/* /index.html 200" é IGNORADO pelo Pages ("Infinite loop detected"), porque o Pages já remove .html/index.
+# - Sem 404.html no output, o Pages já serve "/" para qualquer caminho sem asset (comportamento SPA padrão).
+# - O Expo (web.output=static) gera +not-found.html, não 404.html, então o fallback SPA continua ativo.

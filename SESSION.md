@@ -1,32 +1,40 @@
 # SESSION.md — Estado da sessão
 
-**Atualizado em:** 27/10/2026
+**Atualizado em:** 28/10/2026
 
 ## Fase atual
-FASE 1 — SETUP · etapa "Criação do Projeto" + "Setup inicial do Ambiente" (Prompt 1A) — **concluída, aguardando aprovação**.
+FASE 1 — SETUP · etapa "Verificação do Ambiente" (Prompt 1B) — **concluída, aguardando aprovação**.
 
 ## Última ação
-- Projeto Expo criado com o template oficial `default@sdk-58` (Expo SDK 58, React Native 0.88, React 19.3, TypeScript 6.0, Expo Router), exemplo removido via `reset-project`.
-- `web.output` mudado para `"static"`; nome do app ajustado.
-- `.gitignore` reforçado: segredos, `.env*`, `.wrangler/`, CSVs, dumps, backups, builds.
-- Estrutura de pastas provisória criada (ADR-002) e arquivos de contexto escritos.
-- Backlog movido para `docs/backlog-local-first.pdf` e versionado.
+- Ambiente verificado executando comandos (detalhes em `docs/PROVA-DE-VIDA.md`): Node 24.16.0, npm 12.0.2, JDK 17 (Temurin), Android SDK (platforms 36/37, build-tools 36, NDK 27, **CMake 4.1.2** instalado pelo Kaynan), `expo-doctor` 20/20, wrangler 4.154.0 (devDependency).
+- Aparelho de teste registrado no TRD: **OPPO CPH2699, Android 16, ColorOS 16**. iPhones: iOS 26.x e 18.x.
+- Prova de vida:
+  - **Web dev:** OK. **Export estático:** OK, servido com `wrangler pages dev`; SQLite no web OK (OPFS, precisa de COOP/COEP e de `.wasm` no Metro).
+  - **APK de debug:** gerado e instalado no OPPO; o app abre. **SQLite nativo:** OK, com persistência.
+  - **Preview no Cloudflare:** **não publicado** (não autorizado).
+- `public/_headers` (COOP/COEP, nosniff, referrer, cache) e `public/_redirects` (sem regras, explicado) criados.
+- Docs: `docs/PROVA-DE-VIDA.md`, `docs/ASSINATURA.md`, `docs/DEPLOY-CLOUDFLARE.md`; ADR-004 a ADR-008 em `DECISIONS.md`.
+- Código descartável removido: rota `proto-sqlite`, `metro.config.js`, dependência `expo-sqlite`, `android/`, `dist/`, app de prova desinstalado do OPPO.
 
 ## Próximo passo
-Prompt 1B (a definir pelo humano). Sugestões ainda sem execução: verificar `npx expo start --web` e o primeiro dev build Android; escolher o runner de testes; criar o lint de fronteiras de `src/core`/`src/platform`.
+Próxima etapa a definir pelo Kaynan. Candidatos: autorizar o preview no Pages (login `npx wrangler login` feito por ele) para testar no iPhone; aprovar o runner de testes (ADR-008).
 
 ## Bloqueios
-- Nenhum bloqueio técnico.
-- A seção 0.5 original ("Estrutura de pastas alvo") não foi recebida; a estrutura atual é provisória.
+- Preview no Cloudflare depende de autorização e de login do Kaynan.
 
 ## Decisões pendentes
-1. iPhone/PWA entra no critério de saída do MVP? (DECISIONS.md, item 23)
-2. Os 24 pontos de impacto da nova arquitetura (DECISIONS.md), principalmente: armazenamento e criptografia no PWA, notificações no PWA, formato de backup entre plataformas.
-3. Local do código dos Épicos 1 e 2 (F-07), que será informado na Descoberta.
-4. Dependências do template (`@expo/ui`, `expo-glass-effect`, `expo-symbols`, `expo-image`, `expo-web-browser`, `expo-device` etc.) foram mantidas como vieram; avaliar remoção na Descoberta.
-5. `npm audit` acusou 8 vulnerabilidades (5 low, 3 high) nas dependências do template; não analisadas.
-6. `allowBackup=false` (F-03) ainda não configurado.
+1. `android.package` definitivo (ADR-005, hoje provisório `com.kaynansouza.financasecasa`).
+2. Direct Upload como forma de deploy (ADR-006).
+3. Instalar `jest-expo` (ADR-008).
+4. Tornar o `cmake.dir` (CMake 4.1.2) reproduzível, já que `android/` é gerado.
+5. iPhone/PWA no critério de saída do MVP; 24 pontos de impacto da arquitetura (DECISIONS.md).
+6. Criptografia do banco no PWA (SQLCipher não existe no web) e despejo do OPFS (`persisted() = false`).
+7. Manifest e service worker do PWA (sem eles, não abre offline nem instala direito).
+8. `allowBackup` vem `true` no prebuild; F-03 exige `false`.
+9. Local do código dos Épicos 1 e 2 (F-07).
+10. Dependências extras do template e as 8 vulnerabilidades do `npm audit` (não analisadas).
 
 ## Não testado
-- `expo start` (web e Android), `expo export -p web`, build Android: **nada foi executado**.
-- Checagem de tipos: ver o resultado no relatório da etapa.
+- Preview em `*.pages.dev`; abrir, instalar e usar offline no **iPhone** e no **Android via navegador**.
+- OPFS / SharedArrayBuffer no **Safari do iOS** (o web só foi testado no Chrome 156 do Windows).
+- Build **release** assinado; SQLCipher; emulador Android.

@@ -1,0 +1,11 @@
+# Cloudflare Pages: copiado para a raiz de dist/ pelo `expo export`. Mínimo da Fase 1; revisar no TRD (segurança e CSP).
+# COOP/COEP: exigidos pelo expo-sqlite no web (SharedArrayBuffer). Verificados com `wrangler pages dev`.
+/*
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: credentialless
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+
+# Bundles com hash no nome: cache longo.
+/_expo/static/*
+  Cache-Control: public, max-age=31536000, immutable

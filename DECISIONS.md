@@ -20,6 +20,31 @@
 - Data: 27/10/2026 · Status: aceita
 - Decisão: `expo.web.output = "static"` (o template vem com `"server"`, que exige servidor). Exportação: `npx expo export --platform web` → `dist/`.
 
+### ADR-004 — Development build local, sem Expo Go
+- Data: 28/10/2026 · Status: aceita (pelo humano)
+- Contexto: o humano queria testar no Expo Go, mas o Expo Go das lojas está no SDK 57 (o projeto é SDK 58) e o SQLCipher não roda no Expo Go.
+- Decisão: development build no SDK 58, gerado **localmente** (`expo prebuild` + Gradle). EAS na nuvem fica como plano B. O `eas build --local` não suporta Windows.
+- Consequência: exige o CMake ≥ 4.1.2 no SDK e `cmake.dir` configurado (MAX_PATH; ver `docs/PROVA-DE-VIDA.md` §7). Isso precisa virar configuração reproduzível.
+
+### ADR-005 — `android.package` provisório
+- Data: 28/10/2026 · Status: **proposta (pendente de confirmação)**
+- Decisão provisória: `com.kaynansouza.financasecasa`, exigido pelo `prebuild`.
+- Pendente: confirmar antes da primeira distribuição. O package e a chave de assinatura formam a identidade do app; trocar depois obriga a reinstalar.
+
+### ADR-006 — Deploy do PWA por Direct Upload (wrangler)
+- Data: 28/10/2026 · Status: **proposta (recomendação do agente)**
+- Decisão proposta: Cloudflare Pages via `wrangler pages deploy` (sem integração Git). Nada publica sem comando explícito, e o build é local.
+- Consequência: um projeto Direct Upload não migra para a integração Git depois.
+
+### ADR-007 — Sem fallback SPA em `_redirects`
+- Data: 28/10/2026 · Status: aceita (verificado)
+- Contexto: o `/* /index.html 200` é ignorado pelo Pages ("Infinite loop detected"), e o Pages já faz fallback SPA quando não existe `404.html`.
+- Decisão: `public/_redirects` sem regras; nunca gerar `404.html` sem rever esse comportamento.
+
+### ADR-008 — Runner de testes
+- Data: 28/10/2026 · Status: **proposta (pendente de aprovação para instalar)**
+- Proposta: `jest-expo` (Jest 30) como runner único, que é o único documentado pelo Expo SDK 58. Playwright para o e2e web, numa etapa posterior.
+
 ## Pontos do backlog que a nova arquitetura invalida ou muda (NÃO resolvidos)
 
 | # | Ponto do backlog | O que muda |
