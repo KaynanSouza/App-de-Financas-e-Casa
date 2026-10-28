@@ -8,7 +8,7 @@ Uma única fonte de verdade, **privada**, para o dinheiro e a rotina da casa. O 
 
 ## Escopo do MVP (BRD §4)
 - **Fundação:** bloqueio PIN/biometria (F-01), banco criptografado (F-03), exportar/apagar (F-04), log local (F-05), backup em formato único Android ↔ iPhone (F-06), núcleo local **portado do código antigo com triagem** (F-07, D-045).
-- **Importação (portada do `dia-a-dia`, D-045):** CSV de Nubank, C6, Santander, BB, Itaú e Bradesco; perfis; dedupe; categorização; correção com aprendizado; dashboard (C-01..C-06).
+- **Importação (portada do `dia-a-dia`, D-045):** CSV de Nubank, Itaú, Bradesco, Banco do Brasil, Caixa e Inter (D-048); perfis; dedupe; categorização; correção com aprendizado; dashboard (C-01..C-06).
 - **Contas e alertas:** A-01, A-03, A-04, A-05 (Android); faixa no app + `.ics` no iPhone (D-001).
 - **Assinaturas:** S-01..S-04, cotação manual (D-032).
 - **Compras:** L-01..L-05, L-08.

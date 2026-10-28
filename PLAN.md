@@ -1,6 +1,6 @@
 # PLAN.md — Plano de etapas · Casa em Dia
 
-> Versão 1.1 · 28/10/2026 · Fase 3 (Codificação), passo "Divisão em Etapas". v1.1: código antigo encontrado → porte com triagem (D-045). **Aguardando aprovação do Kaynan.**
+> Versão 1.2 · 28/10/2026 · Fase 3 (Codificação), passo "Divisão em Etapas". v1.1: código antigo → porte com triagem (D-045). v1.2: bancos (D-048), curva do PIN (D-029), só OPPO para testes (D-049, proposta), lançamento manual (D-050, proposta), Assinaturas não versionadas no inventário. **Aguardando aprovação do Kaynan.**
 > Fontes: `docs/backlog-local-first.pdf` (escopo funcional), `BRD.md` §4–5 (escopo vigente, D-044/D-045), `TRD.md`, `UX.md`, `ARCH.md`, `DECISIONS.md` (ADR-001..008, D-001..D-045), código antigo `dia-a-dia` (§0.4), `docs/matriz-paridade.md`, skills `backlog-pbi`, `git-versionamento`, `testing-strategy`.
 > Regra: **uma etapa por vez**; só avança com testes verdes + aprovação. Cada etapa = 1 sessão de 1–3 h (com até 5 h/semana, D-043, ≈ 2 etapas/semana).
 
@@ -10,7 +10,7 @@
 1. **Código antigo encontrado (D-045, substitui D-036)**: a E-06 é **inventário e porte** do núcleo, como pedido. O porte é **com triagem** (§0.4): lógica pura vai para `src/core` com testes escritos durante o porte; código de plataforma vira adaptador; telas são só referência. Como o código antigo **não tem testes nem golden files**, os golden files **de banco** (CSV anonimizado) continuam na Importação (E-12/E-13).
 2. **Service worker/offline sobe para o Sprint 2 (E-07)**, logo depois da fundação, e não fica perto do fim. Motivos da Descoberta: (a) no iPhone o app da Tela de Início tem **armazenamento separado** do Safari, então a trava "instale primeiro" (D-002) precisa existir antes de qualquer dado real no iPhone; (b) o BRD §4.5 põe manifest + SW no Sprint 2; (c) PWA preso em cache antigo é caro de corrigir depois; (d) L-01 ("offline no mercado") e todas as demonstrações no iPhone dependem disso.
 3. **Playwright sobe para a E-03** (D-042 previa no sprint do PWA). O contrato da porta `db` precisa rodar no adaptador web real (OPFS/WASM), e isso não roda no Jest/Node.
-4. **E-02 tem uma página de benchmark descartável** (não é UI de produto), publicada num preview de branch `spike/*`, porque a medição precisa ser feita num iPhone real.
+4. **E-02 tem uma página de benchmark descartável** (não é UI de produto), publicada num preview de branch `spike/*`, para medir no Chrome do OPPO e, na J-1, no Safari de um iPhone emprestado (D-049).
 5. **Ordem "F-07 antes de tudo"**: E-03..E-05 não usam regra de negócio; só usam utilitários mínimos (UUID pela porta `crypto`, relógio). Por isso a ordem pedida (E-03 → E-06) não viola a dependência.
 6. **Outras perguntas do spike** (D-004/SESSION) foram distribuídas pelas etapas que precisam delas: `Intl`/Hermes → E-06; Web Share no standalone → E-05; `.ics` `VALARM` e Badging API → E-22; `expo-camera` no Safari → E-33; passkey PRF → **R2** (D-003), fora do MVP.
 
@@ -19,6 +19,7 @@
 - **Portões automáticos:** `npx tsc --noEmit`, `npm test` (inclui o **teste de fronteira de imports** da E-01), `npx expo-doctor`, `npx expo export -p web` + "sem URL externa no `dist/`" (script da E-01). Na E-06 tudo isso vira CI (GitHub Actions), que roda quando o Kaynan fizer push.
 - **Autoteste no aparelho** (proposto na E-03): rota `/dev/selftest`, só presente em builds de debug e de preview (`EXPO_PUBLIC_SELFTEST=1`), que roda as suítes de contrato/golden **nos adaptadores reais** com banco **separado e sintético**. Android: `scripts/selftest-android.ps1` (deep link + `adb logcat`); web: Playwright. A CI verifica que o build de **produção** não contém a rota.
 - **A11y:** checklist `UX.md` §9.2 (14 itens) + skill `a11y-expo` em toda tela nova; roteiro manual **TalkBack no OPPO** e **VoiceOver no iPhone (PWA)**.
+- **Sem iPhone (D-049, proposta):** o único aparelho é o OPPO. Todo item "iPhone real" de uma etapa é verificado agora no **Playwright WebKit** (e no Chrome do OPPO quando fizer sentido) e entra em `docs/testes/fila-iphone.md` para a próxima **janela de iPhone emprestado** (J-1..J-3, §1.1). A etapa fecha com o item marcado "pendente de iPhone", nunca como "testado".
 - **Segurança:** skill `security-review` quando tocar dados/arquivos/logs/auth/headers; nunca dado real; valores em centavos; contas `****1234`.
 - **Paridade:** linha atualizada em `docs/matriz-paridade.md` no mesmo commit; "?" resolvido vira fato com fonte e data.
 - **Demonstração:** APK de debug (`arm64-v8a`) instalado no OPPO + preview `https://<branch>.casa-em-dia-44l.pages.dev` (deploy de preview **só depois de avisar**; produção **só com comando explícito**).
@@ -43,7 +44,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 | `security/privacy/PrivacyShield` | Adaptar → `screen-security` | E-10 |
 | `logging/{logger,rotation}`, `services/diagnostics` | Adaptar | E-11 |
 | `import/stream/*`, `import/{sniff,limits}` | Portar · `reader` → porta `files` | E-12 |
-| `import/profiles/*`, `import/row-mapper` | Portar; + C6, Santander novos | E-13 |
+| `import/profiles/*`, `import/row-mapper` | Portar os 6 perfis (D-048) | E-13 |
 | `core/dedup/fingerprint`, `import/{commit,undo,csv-retention}` | Portar | E-14 |
 | `import/{scheduler,analyze,job,progress-store,session,steps}` | Portar (nativo) · Web Worker novo | E-15 |
 | `categorization/{engine,dictionary,fuzzy,factory,seed}`, `builtin/*` | Portar; categorias → D-030 | E-16 |
@@ -54,7 +55,11 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 | `services/notifications/{native}`, `services/diagnostics/alerts` | Adaptar → `notifications.native.ts` | E-22 |
 | `services/notifications/{plan,reminders,scheduler,backup-reminder}` | Portar (plano/ids) + adaptar | E-23 |
 | `services/notifications/actions` | Adaptar | E-25 |
-| `transactions/manual`, `maintenance.ts` | Avaliar no inventário (lançamento manual não é PBI do MVP: **perguntar** antes de portar) | E-06 |
+| `transactions/manual` + tela `transactions/manual` | Portar **se aprovado** (C-08, D-050 proposta) | E-17b |
+| `maintenance.ts` | Avaliar no inventário | E-06 |
+| `subscriptions/{catalog,money,draft,repo,service}` + `0005_subscriptions` (não versionados) | Portar; **remover cotação por API** (D-032) | E-26, E-27 |
+| `subscriptions/detect` | Portar; medir a precisão ≥ 80% | E-29 |
+| `components/{RatesPanel,ServiceAvatar}`, telas `subscriptions/*` | Só referência (sem logos, D-032) | E-26..E-29 |
 | `app/**`, `components/**`, `theme/*` | Só referência de fluxo; UI nova (D-015..D-028) | E-01 em diante |
 
 ---
@@ -81,11 +86,14 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 | Marco | Quando | O quê | Critério |
 |---|---|---|---|
 | **M-0** Velocidade | Fim da E-11 | Medir horas reais por etapa (Sprints 0–2) e propor a data do beta | Data proposta registrada em `DECISIONS.md` (revisão de D-043) |
-| **M-1a** Lembretes Android 14 dias | Começa no fim da E-23; termina antes da E-40 | OPPO (ColorOS 16) + **2º fabricante**: app fechado, reboot, economia de bateria, restauração de backup | 100% dos lembretes no horário (± tolerância do modo inexato registrada); planilha de resultado em `docs/testes/` |
-| **M-1b** Estratégia de alertas do iPhone | E-22 (prova) e E-24 (validação) | `.ics` importado no Calendário do iOS 18 e 26, com `VALARM` tocando; faixa ao abrir; badge (se houver) | Alarme do Calendário toca; reexportar atualiza em vez de duplicar (ou degradação documentada) |
-| **M-2** Backup cruzado | Prévia na E-05; completo na E-40 | Backup OPPO → restaurar no PWA do iPhone e o inverso, com dados de todos os módulos | Restauração equivalente (contagens + somas por tabela iguais) nos dois sentidos, **antes do beta** |
-| **M-3** PWA offline e atualização | E-07 (primeiro); revalidado na E-40 | iPhone: instalar, modo avião, reabrir após dias, deploy A → B com faixa "Nova versão" | Abre em modo avião; dados persistem; atualização só com toque do usuário |
+| **M-1a** Lembretes Android 14 dias | Começa no fim da E-23; OPPO antes do beta; 2º fabricante nas 2 primeiras semanas do beta (D-049) | OPPO (ColorOS 16): app fechado, reboot, economia de bateria, restauração de backup; depois um amigo Android de outro fabricante, com roteiro | 100% no horário (± tolerância do modo inexato); resultados em `docs/testes/` |
+| **M-1b** Estratégia de alertas do iPhone | E-22/E-24 no WebKit; validação real na **J-2** | `.ics` importado no Calendário do iOS, com `VALARM` tocando; faixa ao abrir; badge (se houver) | Alarme toca; reexportar não duplica (ou degradação documentada) |
+| **M-2** Backup cruzado | Prévia na E-05 (OPPO ↔ web no Chrome/WebKit); completo na **J-3** (E-40) | Backup OPPO → PWA no iPhone e o inverso, com dados de todos os módulos | Restauração equivalente (contagens + somas iguais) nos dois sentidos, **antes do beta** |
+| **M-3** PWA offline e atualização | E-07 no WebKit/Chrome; real na **J-1**; revalidado na **J-3** | iPhone: instalar, modo avião, reabrir após dias, deploy A → B com faixa "Nova versão" | Abre em modo avião; dados persistem; atualização só com toque do usuário |
 | **M-4** Beta 30 dias | Depois da E-40 | Amigos usando sem ajuda (D-012) | Critérios D-012 + BRD §3.2 |
+| **J-1** Janela iPhone 1 | Logo depois da E-07 | Instalação, offline, OPFS/`persist()`, confirmação da medição da E-02, itens da fila | Fila zerada até a E-07 |
+| **J-2** Janela iPhone 2 | Logo depois da E-24 | `.ics` com alarme (M-1b), faixa, badge, Web Share no modo instalado, itens da fila | Fila zerada até a E-24 |
+| **J-3** Janela iPhone 3 | Na E-40 | M-2, M-3, VoiceOver nas telas principais, itens da fila | Fila zerada; sem J-3 → iPhone "experimental" no beta (D-049) |
 
 ---
 
@@ -107,7 +115,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
   - [ ] Config plugin `cmake.dir` (ou variável documentada) e build `npx expo prebuild -p android` + `gradlew assembleDebug` do zero.
   - [ ] `tests/architecture/boundaries.test.ts` (core sem react/expo/platform; nada importa `expo-*` fora de `src/platform`).
   - [ ] `scripts/check-no-external-urls` sobre `dist/`.
-- **Critérios de aceite:** (1) APK de debug instala e abre no OPPO nas 5 abas; (2) preview abre no iPhone (Safari) nas 5 abas; (3) tema segue o sistema e pode ser trocado em Mais; (4) contraste dos tokens ≥ 4,5:1 (texto) e ≥ 3:1 (componentes) nos dois temas, **calculado em teste**; (5) build Android reproduzível em clone limpo seguindo o README; (6) fronteira de imports e "sem URL externa" verdes.
+- **Critérios de aceite:** (1) APK de debug instala e abre no OPPO nas 5 abas; (2) preview abre no Chrome do OPPO e no Playwright WebKit nas 5 abas (Safari do iPhone vai para a fila da J-1); (3) tema segue o sistema e pode ser trocado em Mais; (4) contraste dos tokens ≥ 4,5:1 (texto) e ≥ 3:1 (componentes) nos dois temas, **calculado em teste**; (5) build Android reproduzível em clone limpo seguindo o README; (6) fronteira de imports e "sem URL externa" verdes.
 - **Testes:** U (contraste WCAG calculado dos tokens; fronteira) · E: não (Playwright entra na E-03) · M: navegação das abas com TalkBack/VoiceOver; fonte do sistema em 200% (rótulos das abas) ⓜ.
 - **UX/a11y/segurança:** abas com ícone + rótulo; rótulos a 200% (D-018, risco conhecido); foco visível no web; nenhuma URL externa; `noindex` no preview.
 - **Demonstração:** APK: 5 abas, tema claro/escuro seguindo o sistema, troca manual em Mais. URL: as mesmas 5 abas no iPhone, coluna centralizada no desktop.
@@ -116,23 +124,23 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 
 ### E-02 — SPIKE: criptografia do banco no web e KDF
 - **Sprint:** 0 · **PBIs:** F-03 (estratégia web), F-01/F-06 (KDF). Decisões D-004, D-039.
-- **Objetivo:** escolher, por medição em iPhone real, a estratégia de cifra do banco no web e a KDF única (PIN e backup), registrando ADRs.
+- **Objetivo:** escolher, por medição (WebKit, Chrome desktop e Chrome do OPPO agora; iPhone na J-1, D-049), a estratégia de cifra do banco no web e a KDF única (PIN e backup), registrando ADRs.
 - **Porte (D-045):** `backup/kdf.ts` e `security/pin/pin-hash.ts` (`@noble/hashes`: Argon2id e PBKDF2) entram como candidata forte da KDF; `@noble/ciphers` como plano B de AES-GCM.
 - **Escopo:** branch `spike/web-encryption` (código **descartável**, não vai para a `main`); gerador de dados sintéticos (~10 mil transações, reaproveitável em `tests/fixtures/generators/`, este sim vai para a `main`); bancada comparando as 3 opções do D-004: (1) banco em memória + snapshot AES-GCM no OPFS, (2) cifra por coluna na aplicação, (3) SQLite WASM com cifra por página (verificar a documentação atual de builds como SQLite3 Multiple Ciphers / SQLCipher WASM e o encaixe com o `expo-sqlite` web); KDF: (a) PBKDF2-SHA-256 (WebCrypto no web; lib JS ou WebCrypto do runtime no Android, **verificar** o que o Hermes/SDK 58 oferece), (b) Argon2id JS/WASM nos dois, (c) módulo nativo. Modelo de chaves a decidir: **DEK aleatória envolvida por KEK derivada do PIN** (proposta) × chave derivada direto do PIN.
 - **Fora de escopo:** UI de produto, porta `db` definitiva (E-03), passkey (R2, D-003).
 - **Dependências:** E-01 (pipeline de preview e APK).
-- **Plataformas:** iPhone/PWA = bancada web medida no Safari do iPhone (aba e, se possível, instalado) · Android = bancada de KDF numa tela de debug do APK (a mesma KDF precisa dar **saída idêntica** nos dois). Portas exploradas: `db`, `crypto`, `kdf`.
+- **Plataformas:** iPhone/PWA = **sem iPhone (D-049)**: bancada web medida no Playwright WebKit, no Chrome desktop e no Chrome do OPPO (aproximação de navegador móvel); confirmação no Safari do iPhone na **J-1** · Android = bancada de KDF numa tela de debug do APK (a mesma KDF precisa dar **saída idêntica** nos dois). Portas exploradas: `db`, `crypto`, `kdf`.
 - **Tarefas:**
   - [ ] Gerador sintético determinístico (semente fixa): contas, ~10 mil `txn`, categorias.
   - [ ] Bancada web: para cada opção, medir abrir/carregar, inserir 1 transação (custo de persistir), consulta do dashboard, pico de memória (o que der para medir no Safari; registrar o método), tamanho extra no bundle.
   - [ ] Bancada KDF: tempo no OPPO e no iPhone para parâmetros candidatos (alvo ≈ 1–2 s, D-041); vetor de teste com saída igual nos dois.
   - [ ] Verificar recomendações atuais (OWASP) para PBKDF2/Argon2id e registrar a fonte e a data.
   - [ ] ADR **D-046** (cifra do banco web) e **D-047** (KDF + parâmetros + modelo de chaves); atualizar D-004/D-039, TRD §1/§2.1/§10.1, matriz (F-03), skills `sqlite-web-encrypted` e `backup-cross-platform`.
-- **Critérios de aceite:** (1) tabela de medições por opção no iPhone real (iOS 18 e/ou 26) e no Chrome desktop, com método descrito; (2) a opção escolhida carrega ~10 mil transações em **≤ 2 s** no iPhone (ou o ADR registra a degradação e o plano); (3) KDF escolhida em ≈ 1–2 s no OPPO e no iPhone, com vetor de teste idêntico; (4) dependência nova (se houver) justificada: bundle web/nativo, manutenção, licença GPL-3.0-compatível, suporte web **e** Android; (5) nenhuma linha do spike na `main` além de ADR/docs e do gerador.
+- **Critérios de aceite:** (1) tabela de medições por opção no WebKit, no Chrome desktop e no Chrome do OPPO, com método descrito; (2) a opção escolhida carrega ~10 mil transações em **≤ 1 s nos aproximadores** (margem para os ≤ 2 s no iPhone), e o ADR fica **provisório até a J-1**; (3) KDF escolhida em ≈ 1–2 s no OPPO e no WebKit, com vetor de teste idêntico; (4) dependência nova (se houver) justificada: bundle web/nativo, manutenção, licença GPL-3.0-compatível, suporte web **e** Android; (5) nenhuma linha do spike na `main` além de ADR/docs e do gerador.
 - **Testes:** U (gerador determinístico; vetor KDF) · M: medições no iPhone e no OPPO ⓜ.
 - **UX/a11y/segurança:** STRIDE da opção escolhida (I: aparelho perdido; força bruta do PIN de 10⁶ combinações → KDF + espera crescente); chave não-extraível e só em memória no web.
 - **Demonstração:** URL do preview do spike mostrando a tabela de tempos no iPhone; tela de debug no APK com o tempo da KDF. (Não é UI de produto.)
-- **Riscos / plano B:** nenhuma opção cumpre 2 s → cifra por coluna só nos campos sensíveis (descrição, valor, nome) + índices em claro, documentado no STRIDE; Argon2id lento no Hermes → PBKDF2 com iterações altas; **sem iPhone disponível** → a etapa não fecha (bloqueio, §17).
+- **Riscos / plano B:** nenhuma opção cumpre 2 s → cifra por coluna só nos campos sensíveis (descrição, valor, nome) + índices em claro, documentado no STRIDE; Argon2id lento no Hermes → PBKDF2 com iterações altas; medição real na J-1 pior que o esperado → trocar para o plano B antes de haver dados reais no iPhone (o beta ainda não começou).
 - **Status:** [ ] pendente
 
 ---
@@ -181,7 +189,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 - **Demonstração:** APK: criar PIN, ativar biometria, sair 1 min e voltar → bloqueio. URL: criar PIN, errar 5× → "Aguarde 30 s", recarregar → espera continua.
 - **Riscos / plano B:** etapa grande → dividir em **E-04a** (PIN + KDF + chave + espera) e **E-04b** (biometria + trava por 2º plano); biometria não libera a chave do Keystore com a lib do Expo → chave protegida por PIN no Android também (degradação documentada).
 - **Status:** [ ] pendente
-- ⚠ **Curva da espera crescente não está especificada** (só "Aguarde 30 s" no UX). Proposta: 30 s, 1 min, 2 min, 5 min, 15 min (teto). Confirmar (§17).
+- **Curva da espera crescente (aceita, D-029):** 30 s → 1 min → 2 min → 5 min → 15 min (teto).
 
 ### E-05 — Backup único criptografado: formato, ida e volta, entre plataformas
 - **Sprint:** 1 · **PBIs:** F-06 (formato, restauração, teste automatizado). D-008.
@@ -328,7 +336,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 ### E-13 — Perfis de banco e mapeamento manual (bancos do Kaynan)
 - **Sprint:** 3 · **PBIs:** C-02, C-01 (detecção de formato).
 - **Objetivo:** o app reconhece o banco pelo cabeçalho e, se não reconhecer, deixa o usuário mapear as colunas e salvar o perfil.
-- **Porte (D-045):** `import/profiles/{builtin,detect,types,repo}.ts`, `row-mapper.ts`, telas `import/mapping`/`preview` como referência; perfis Nubank, Itaú, Bradesco, BB portados; Caixa e Inter como extras; C6 e Santander novos.
+- **Porte (D-045):** `import/profiles/{builtin,detect,types,repo}.ts`, `row-mapper.ts`, telas `import/mapping`/`preview` como referência; perfis dos 6 bancos-alvo (D-048) portados: Nubank, Itaú, Bradesco, BB, Caixa, Inter.
 - **Escopo:** perfis embutidos versionados (2–3 bancos com amostra anonimizada); detecção por cabeçalho normalizado; tabela `bank_profile` (migração 002) + `account` (`mask_last4`); tela **Prévia/mapeamento** (UX nº 12) com seleção de conta; golden `<caso>.csv` → `<caso>.expected.json` (linhas normalizadas em centavos e `AAAA-MM-DD`).
 - **Dependências:** E-12.
 - **Plataformas:** = (core); perfis novos chegam por APK novo × deploy do PWA (matriz C-02).
@@ -420,6 +428,20 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 
 ## 7. Sprint 5 — Contas
 
+### E-17b — Lançamento manual de transação (**proposta**, D-050)
+- **Sprint:** 4 · **PBIs:** C-08 (novo, Should, **aguarda OK**).
+- **Objetivo:** registrar à mão um gasto ou receita (dinheiro vivo, banco sem CSV), sem contar 2× quando o extrato chegar.
+- **Porte (D-045):** `transactions/manual.ts` (hash próprio que não colide com o dedupe do CSV, mesmo motor de categorização, pagar conta na mesma transação SQL) + tela `transactions/manual` como referência.
+- **Escopo:** tela "Novo lançamento" (valor em centavos, entrada/saída, data, descrição, categoria automática ou escolhida, conta; padrão **Carteira (dinheiro)**); aviso ao lançar numa conta que recebe CSV; na importação, sugestão "Já lançado à mão? [Juntar]" para mesma conta + mesmo valor + data ±3 dias, com confirmação; origem "manual" visível na lista.
+- **Fora de escopo:** pagar conta pelo lançamento (fica na E-21, que usa a mesma função).
+- **Dependências:** E-14, E-16.
+- **Plataformas:** = (core + banco).
+- **Critérios de aceite:** (1) o lançamento entra no dashboard e nos totais; (2) reimportar extratos nunca apaga lançamentos manuais; (3) a junção só acontece com confirmação e é reversível; (4) valores em centavos, sem float.
+- **Testes:** U (validação, sugestão de junção) · I · E · M: formulário com TalkBack ⓜ.
+- **Demonstração:** APK/URL: Gastos → "+ Lançamento" → "Feira R$ 45,00 (Carteira)" aparece em Mercado.
+- **Riscos / plano B:** o usuário lança e importa o mesmo gasto → sugestão de junção + conta Carteira como padrão.
+- **Status:** [ ] proposta (aguarda OK do Kaynan)
+
 ### E-20 — Contas a pagar: recorrência e instâncias (core + banco)
 - **Sprint:** 5 · **PBIs:** A-01. D-031.
 - **Objetivo:** o núcleo gera corretamente as ocorrências e estados de qualquer conta recorrente.
@@ -504,6 +526,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 ### E-26 — Cadastro manual de assinaturas
 - **Sprint:** 7 · **PBIs:** S-01. D-032.
 - **Objetivo:** cadastrar assinaturas com catálogo, moeda estrangeira e "minha parte".
+- **Porte (D-045):** `subscriptions/{catalog,money,draft,repo,service}.ts` + `0005_subscriptions` (não versionados) → core + módulo; **sem** cotação por API (D-032).
 - **Escopo:** migração `subscription`, `subscription_charge`; catálogo embutido de ~20 serviços BR (sem logos, ícone genérico); BRL/USD/EUR com **cotação manual** registrada por cobrança (`fx_rate_micros`, sem float); estados ativa/em teste/pausada/cancelada; "minha parte" em R$ ou %; link de cancelamento opcional (abre no navegador do sistema por ação do usuário).
 - **Dependências:** E-06, E-16 (categorias).
 - **Critérios de aceite (S-01):** campos do PBI; valores do catálogo são sugestões editáveis; canceladas saem do total; conversão mostra a moeda original; zero rede.
@@ -514,6 +537,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 ### E-27 — Dashboard de custo mensal e anual
 - **Sprint:** 7 · **PBIs:** S-03.
 - **Objetivo:** ver o custo mensal equivalente e anual das assinaturas, com soma verificada.
+- **Porte (D-045):** `subscriptions/service.ts` (custo normalizado) → core; tela `subscriptions/index` como referência.
 - **Escopo:** normalização na consulta (valor ÷ meses); cabeçalho mensal/anual com "Como calculamos? ⓘ"; ordenar por valor/próxima cobrança/categoria; 3 maiores e "em teste"; custo líquido × total do plano; anel por categoria + tabela; linha do tempo dos próximos 30 dias.
 - **Dependências:** E-26 (S-02 entra depois; o dashboard já funciona só com o manual).
 - **Critérios de aceite (S-03):** todos os do PBI; **teste automatizado: soma exibida = soma dos itens ativos e em teste**.
@@ -524,6 +548,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 ### E-28 — Lembretes de renovação e cancelamento
 - **Sprint:** 7 · **PBIs:** S-04.
 - **Objetivo:** ser avisado antes da renovação ou do fim do teste, reaproveitando o motor de A-04.
+- **Porte (D-045):** partes de `subscriptions/service.ts` + motor de A-04 já portado.
 - **Escopo:** tipo `subscription.renewal_due` no mesmo `notification_schedule`; padrão 3 dias (7 para anuais) e 1 dia antes do fim do teste; ações "Vou manter"/"Cancelei" (Android na notificação; iPhone na faixa); "possivelmente cancelada" quando a cobrança esperada não aparece no próximo extrato (reage a `transaction.imported`); "acesso até" ao cancelar.
 - **Dependências:** E-23, E-24, E-26, E-14.
 - **Plataformas:** Android = notificação com ações · iPhone/PWA = faixa + `.ics` (≈).
@@ -535,6 +560,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 ### E-29 — Detecção de assinaturas no CSV
 - **Sprint:** 7 · **PBIs:** S-02 (4º na ordem de corte).
 - **Objetivo:** sugerir assinaturas encontradas no extrato com poucos falsos positivos.
+- **Porte (D-045):** `subscriptions/detect.ts` → core; tela `subscriptions/detection` como referência.
 - **Escopo:** detector no core (descrição normalizada de C-04, intervalos, mediana/desvio, ±10% valor, ±3 dias, ≥ 2 ocorrências; catálogo = 1); exclui parcelas; débitos fixos (aluguel) apontam para A-01; `suggestion_dismissal`; tela **Sugestões** (confirmar/editar/descartar); confirmar cria a assinatura, vincula as cobranças passadas e estima a próxima; conjunto rotulado sintético/anonimizado.
 - **Dependências:** E-14 (C-03), E-16 (C-04), E-26.
 - **Critérios de aceite (S-02):** todos os do PBI; **precisão ≥ 80%** no conjunto rotulado (teste).
@@ -682,6 +708,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 | C-04 Categorização | Must | E-16, E-19 (meta 70%) | ✔ |
 | C-05 Correção | Must | E-17 | ✔ |
 | C-06 Dashboard | Must | E-18 | ✔ |
+| C-08 Lançamento manual (**proposto**) | Should | E-17b | se aprovado |
 | A-01 Contas | Must | E-20, E-21 | ✔ |
 | A-03 Confiabilidade | Must | E-22 | ✔ |
 | A-04 Motor | Must | E-23, E-24 (iPhone), E-40 (M-1a) | ✔ |
@@ -710,13 +737,13 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 
 | # | Risco | Efeito | Mitigação |
 |---|---|---|---|
-| 1 | E-02 sem iPhone real | Trava E-03 (web) e toda a cadeia de cripto | Agendar o iPhone antes; se atrasar, a E-03 começa pelo adaptador nativo + fake e só fecha o web depois |
+| 1 | Não há iPhone (D-049) | Decisões do web tomadas por aproximação; surpresas no Safari | WebKit em toda etapa + fila do iPhone + janelas J-1..J-3; decisões web provisórias até a J-1 |
 | 2 | KDF lenta demais no Hermes | E-04/E-05 mudam | Medida já na E-02; PBKDF2 como plano B |
 | 3 | Sem CSVs anonimizados na hora do Sprint 3 | E-12..E-19 param | Script de anonimização entregue na E-12; o Kaynan exporta durante o Sprint 2 |
 | 4 | Critérios antigos de C-01..C-06 ausentes | Retrabalho na Importação | Contrato = BRD §5.2 + tabela do backlog + comportamento do código antigo (caracterização); divergência vira pergunta |
 | 4b | Código antigo traz decisões incompatíveis (backup com `.db` cru, ML, categorias, só Android) | Porte "literal" quebra D-008/D-030/paridade | Triagem do §0.4: decisões vigentes prevalecem; nada entra sem teste |
 | 4c | SDK 57 → 58 e Hermes/web | APIs do código antigo mudaram ou não existem no web | Conferir a doc atual em cada porte; adaptador web sempre novo |
-| 5 | 2º fabricante Android tarde | M-1a (14 dias) atrasa o beta | Pedir o aparelho já no Sprint 5; o M-1a corre em paralelo às etapas 26+ |
+| 5 | Só um fabricante Android (D-049) | Critério "2 fabricantes" só fecha no beta | OPPO (o mais agressivo) antes; amigo Android nas 2 primeiras semanas do beta; emulador API 29/37 para versões |
 | 6 | Mudança de esquema depois de backups reais | Restauração quebra | `schemaVersion` + migração testada em toda etapa com migração (vetor de backup antigo restaurando) |
 | 7 | Etapas grandes (E-04, E-05, E-23) | Estouram a sessão | Divisões a/b já previstas |
 | 8 | Ritmo ≤ 5 h/semana | MVP longo | M-0 mede; aplicar a ordem de corte (§15) sem cortar os "nunca cortar" |
@@ -730,6 +757,7 @@ Plataforma: **=** igual · **≈** degradado · **✕** ausente (alternativa des
 | Ordem | Corte | Etapas afetadas |
 |---|---|---|
 | 1 | L-05 Histórico/comparativo | E-37 sai |
+| 1b | C-08 Lançamento manual (se aprovado) | E-17b sai |
 | 2 | A-05 Ações rápidas | E-25 sai (ações ficam na faixa/lista) |
 | 3 | L-03 só a câmera/EAN | E-33 sai (EAN digitado continua na E-32) |
 | 4 | S-02 Detecção | E-29 sai |
@@ -747,7 +775,8 @@ Todas as etapas: **[ ] pendente**. Próxima: **E-01**, aguardando "Start" (3B).
 |---|---|---|
 | ~~1~~ | ~~Porte × reescrita da E-06~~ → **resolvida**: porte com triagem (D-045). | — |
 | 2 | Se você ainda tiver o backlog de 14/10 (critérios de C-01..C-06), ele ajuda; sem ele, o contrato é BRD §5.2 + backlog + comportamento do código antigo. **Não bloqueia mais.** | — |
-| 3 | Quais bancos você usa (para os primeiros golden files) e quando consegue exportar os CSVs? Quem fornece C6 e Santander? Os perfis antigos (Nubank, Itaú, Bradesco, BB, Caixa, Inter) foram feitos a partir de extratos reais? | E-12, E-13, E-19 |
-| 4 | Qual iPhone (modelo e iOS) estará disponível para medir na E-02, e quando? E o 2º fabricante Android para o M-1a? | E-02 (conclusão), M-1a |
+| ~~3~~ | ~~Bancos~~ → **resolvida** (D-048): Nubank, Itaú, Bradesco, BB, Caixa, Inter. Ainda preciso dos CSVs anonimizados de cada um (você roda o script da E-12). | E-12, E-13, E-19 |
+| 4 | Sem iPhone (D-049, **proposta**): aprova as janelas J-1..J-3 com um iPhone emprestado e a mudança do critério de 2 fabricantes para o beta? Há alguém com iPhone para ~3 sessões de 30–45 min? | E-07 (J-1), M-1b, beta |
 | 5 | Aprova os desvios do §0.1: SW/offline no Sprint 2 (E-07), Playwright já na E-03, página de bancada descartável publicada em preview `spike/*` na E-02, rota de autoteste em builds de debug/preview? | E-02, E-03, E-07 |
-| 6 | Curva da espera crescente do PIN (proposta: 30 s, 1 min, 2 min, 5 min, 15 min de teto)? | E-04 |
+| 7 | Lançamento manual (C-08, D-050, **proposta**): inclui no MVP como Should (E-17b)? | E-17b |
+| ~~6~~ | ~~Curva da espera do PIN~~ → **resolvida** (D-029). | — |

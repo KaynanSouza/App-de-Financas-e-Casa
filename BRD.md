@@ -47,7 +47,7 @@ Legenda de situação: **Novo** · **Refazer/Adaptar** (backlog) · **Portar** (
 | F-06 | Backup criptografado e restauração | Must | Novo | Formato único Android ↔ iPhone (D-008) |
 | F-08 | **Onboarding e ajuda** (novo, D-044) | Must | Novo | Instalação no iPhone, onboarding em 4 passos (D-023), ajuda de instalar o APK e de exportar o CSV de cada banco; nunca cortar |
 | F-07 | Porte do núcleo (com triagem) | Must | **Portar** | `src/core` em TS puro + adaptadores; testes escritos no porte; golden files de CSVs anonimizados (D-045) |
-| C-01 | Importação de CSV com detecção de formato | Must | **Portar** | 6 bancos (D-030); Caixa e Inter como extras (D-045) |
+| C-01 | Importação de CSV com detecção de formato | Must | **Portar** | 6 bancos (D-048): Nubank, Itaú, Bradesco, BB, Caixa, Inter |
 | C-02 | Mapeamento de colunas e perfis de banco | Must | **Portar** | |
 | C-03 | Deduplicação e idempotência | Must | **Portar** | |
 | C-04 | Categorização por regras e dicionário | Must | **Portar** | Dicionário antigo como base; categorias ajustadas ao D-030; ML fica para C-07 (R2) |
@@ -107,7 +107,7 @@ Um "sprint" aqui é uma **unidade de escopo**, não 2 semanas: com até 5 h/sema
 - **Modo privacidade:** 👁 oculta todos os valores (D-022).
 
 ### 5.2 Importação e categorização
-- Bancos-alvo: Nubank, C6, Santander, Banco do Brasil, Itaú, Bradesco (D-030); outros pelo mapeamento manual (C-02).
+- Bancos-alvo: Nubank, Itaú, Bradesco, Banco do Brasil, Caixa e Inter (D-048, substitui a lista do D-030); outros (ex.: C6, Santander) pelo mapeamento manual (C-02).
 - Limite 10 MB / 50 mil linhas (reduzir só no iPhone se o teste exigir, com mensagem clara).
 - Importação inteira numa transação; reimportar o mesmo arquivo não muda nada; desfazer em até 30 dias.
 - CSV original **descartado** após importar (opção de reter até 30 dias, criptografado) (D-035).

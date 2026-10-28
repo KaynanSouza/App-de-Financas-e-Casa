@@ -6,7 +6,7 @@ description: Use ao importar/exportar CSV: extratos de bancos brasileiros (C-01.
 # csv-bancos-br — CSV de bancos brasileiros e da lista
 
 ## Objetivo
-Transformar extratos em transações limpas, **sem duplicar**, sem travar a tela e sem nunca vazar dado real. **Código antigo em `../dia-a-dia` (só leitura) é portado com triagem (D-045):** tokenizer, sniff, limites, perfis (Nubank, Itaú, Bradesco, BB + extras Caixa e Inter), row-mapper, fingerprint de dedupe, undo; C6 e Santander são novos; não há golden files antigos. Bancos-alvo: Nubank, C6, Santander, BB, Itaú, Bradesco (D-030). Golden files = CSVs reais do Kaynan anonimizados por **script local** (o agente nunca vê o original). Transferência e fatura ficam fora dos totais; parcela nunca vira assinatura; estorno abate a categoria original (D-030).
+Transformar extratos em transações limpas, **sem duplicar**, sem travar a tela e sem nunca vazar dado real. **Código antigo em `../dia-a-dia` (só leitura) é portado com triagem (D-045):** tokenizer, sniff, limites, perfis dos 6 bancos-alvo (D-048: Nubank, Itaú, Bradesco, BB, Caixa, Inter), row-mapper, fingerprint de dedupe, undo; não há golden files antigos. Bancos-alvo: Nubank, Itaú, Bradesco, BB, Caixa, Inter (D-048; C6/Santander só por mapeamento manual). Golden files = CSVs reais do Kaynan anonimizados por **script local** (o agente nunca vê o original). Transferência e fatura ficam fora dos totais; parcela nunca vira assinatura; estorno abate a categoria original (D-030).
 
 ## Regras do backlog
 - Limites: **10 MB** e **50 mil linhas**; validar memória em aparelho modesto.

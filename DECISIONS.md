@@ -1,6 +1,6 @@
 # DECISIONS.md — Registro de decisões
 
-> Estado: **Fase 2 completa (28/10/2026) + Fase 3 em andamento**. Duas séries: **ADR-001..008** (Fase 1, arquitetura/ambiente) e **D-001..D-045** (Descoberta e Fase 3).
+> Estado: **Fase 2 completa (28/10/2026) + Fase 3 em andamento**. Duas séries: **ADR-001..008** (Fase 1, arquitetura/ambiente) e **D-001..D-050** (Descoberta e Fase 3).
 > Formato: título · data · status (proposta / aceita / provisória / substituída) · decisão · alternativas descartadas · motivo/consequências.
 > Provisórias com revisão marcada: D-004, D-033 (EAN no iPhone), D-038 (Intl no Hermes), D-039 (KDF) → **Fase 3, spike E-02**; D-031 (feriados) → R2; D-043 (data do beta) → após o Sprint 1; ADR-006 (Pages × Workers) → antes da produção.
 
@@ -17,7 +17,7 @@
 | Técnica | D-036..D-042 |
 | Ritmo e restrições | D-043 |
 | Lacunas da Fase 2 | D-044 |
-| Fase 3: código antigo encontrado | D-045 (substitui D-036) |
+| Fase 3: código antigo, bancos, aparelhos, lançamento manual | D-045 (substitui D-036), D-048, D-049, D-050 · D-046/D-047 reservadas ao spike E-02 |
 
 ## Decisões já tomadas pelo humano (a formalizar como ADR)
 
@@ -264,10 +264,11 @@ Todos os itens marcados "provável" ainda precisam ser confirmados na documenta�
 - Lembrete de backup (Android): **mensal, dia 1 às 20h**, no canal "backup" (configurável: semanal/mensal/desligado). Em todas as plataformas: "Backup: há N dias" no Início e em Configurações; > 30 dias (Android) ou > 7 dias (iPhone) vira alerta âmbar; sem backup = aviso persistente, sem bloquear o uso.
 - Destino: o seletor/Compartilhar do sistema escolhe; o texto sugere guardar **fora do celular** (Drive, Arquivos/iCloud Drive). Exportação F-04 avisa que não é criptografada. Compartilhar falhou no iPhone → oferecer download.
 - Descartadas: PIN de 4 dígitos; travar imediatamente por padrão; captura liberada por padrão; lembrete no dia do onboarding; semanal no Android; destino específico.
+- **Atualização 28/10/2026 (aceita pelo Kaynan):** curva da espera crescente após o 5º PIN errado: **30 s → 1 min → 2 min → 5 min → 15 min (teto)** (detalhes propostos pelo agente, a confirmar na E-04: a partir do teto, cada erro mantém 15 min; o contador zera após um PIN correto).
 
 ### D-030 — Importação: bancos, amostras e casos especiais
 - Data: 28/10/2026 · Status: aceita
-- Bancos-alvo do MVP: **Nubank, C6, Santander, Banco do Brasil, Itaú, Bradesco** (conta e cartão quando o banco exportar ambos).
+- Bancos-alvo do MVP: **Nubank, C6, Santander, Banco do Brasil, Itaú, Bradesco** (conta e cartão quando o banco exportar ambos). **Lista substituída pela D-048 (28/10/2026)**: Nubank, Itaú, Bradesco, BB, Caixa, Inter.
 - Golden files: reaproveitar os do **Épico 2** como contrato do porte (F-07). Banco sem golden file: o Kaynan gera o CSV, anonimiza com **script local** (a escrever) e só o resultado entra em `tests/fixtures/`. Arquivo real nunca entra no git. *Pendente:* saber quais bancos o Épico 2 já cobre (Bloco F).
 - Casos especiais (se o Épico 2 já resolver, porta como está):
   - **Transferência entre contas próprias**: categoria "Transferência", fora dos totais; sugere o par saída/entrada de mesmo valor em ≤ 3 dias, com confirmação.
@@ -383,9 +384,37 @@ Todos os itens marcados "provável" ainda precisam ser confirmados na documenta�
   2. **Código de plataforma** (`expo-file-system`, `expo-secure-store`, `expo-sqlite`, notificações, biometria, captura de tela) → reescrito como adaptador **atrás das portas** de `src/platform`, com o código antigo como referência para o `.native.ts` e um `.web.ts` novo.
   3. **Telas** (cerca de 3,2 mil linhas) → só referência de fluxo; refeitas no design system novo (D-015..D-028).
   4. **Divergências com decisões vigentes** prevalecem as vigentes: backup antigo guarda o `.db` SQLCipher cifrado → só o envelope (cabeçalho como AAD, AES-GCM, limites anti-DoS, KDF parametrizada) é aproveitado, e o conteúdo vira dump lógico (D-008); modelo TF-IDF + Naive Bayes → C-07, **R2** (não entra no MVP); categorias antigas → ajustadas às 15 do D-030.
-- Fonte congelada: `dia-a-dia` @ `e59f1a1` + árvore de trabalho de 28/10/2026 (20 arquivos alterados sem commit; `git diff` sha256 `2305defab43f…`). O repositório antigo é **só leitura**: o agente não commita nem altera nada lá. Se o Kaynan mudar algo lá depois, registrar a nova referência aqui.
-- Bancos: meta do MVP continua a do **D-030** (Nubank, C6, Santander, BB, Itaú, Bradesco), com golden files. Os perfis antigos de **Caixa e Inter** são portados como **extras**, sem bloquear a saída do MVP; C6 e Santander são novos. Não se sabe se os perfis antigos vieram de extratos reais: os golden files anonimizados decidem.
+- Fonte congelada: `dia-a-dia` @ `e59f1a1` + árvore de trabalho de 28/10/2026 (20 arquivos alterados sem commit + **13 arquivos não versionados do Épico 4 — Assinaturas** (`src/subscriptions/*`, `0005_subscriptions`, telas `subscriptions/*`, ~1,8 mil linhas); `git diff` sha256 `2305defab43f…`). O repositório antigo é **só leitura**: o agente não commita nem altera nada lá. Se o Kaynan mudar algo lá depois, registrar a nova referência aqui.
+- Bancos: **atualizado pela D-048** — os 6 perfis antigos (Nubank, Itaú, Bradesco, BB, Caixa, Inter) são exatamente os bancos com que o Kaynan quer compatibilidade; C6 e Santander saem (só mapeamento manual).
 - KDF/cripto: o código antigo usa `@noble/hashes` (Argon2id 19 MiB/t=2 no backup; PBKDF2-SHA-256 150 mil iterações no PIN, "~1 s no Hermes") e `@noble/ciphers` (AES-GCM). Isso entra como **candidata forte** na E-02 (JS puro, igual no Hermes e no web); a decisão final segue por medição (D-039). Dependência a justificar formalmente (licença, bundle, manutenção) antes de entrar.
 - Licença e autoria: o código é do Kaynan; entra neste repositório sob GPL-3.0; cada commit de porte cita a origem (`Ported-from: dia-a-dia@e59f1a1+wt <caminho>`).
 - Descartadas: reescrever do zero (desperdiça código funcional em TS); copiar o projeto inteiro (traz decisões incompatíveis: backup cru, só Android, SDK 57, sem testes, package `com.diaadia.app`).
 - Consequências: C-01..C-06 passam de "Reescrever" para **"Portar (adaptar)"**; A-01, A-04, A-05 e o lembrete de backup ganham base existente; o golden de banco continua dependendo das amostras anonimizadas; SDK 57 → 58 exige conferir a doc atual das APIs usadas; a estimativa do MVP cai.
+
+### D-048 — Bancos-alvo do MVP: os 6 perfis do código antigo (substitui a lista do D-030)
+- Data: 28/10/2026 · Status: aceita (Kaynan: "foram os que eu quero ter compatibilidade")
+- Decisão: bancos-alvo do MVP = **Nubank, Itaú, Bradesco, Banco do Brasil, Caixa e Inter** (conta e cartão quando o banco exportar ambos; Caixa só conta, como no código antigo). Todos com perfil embutido e golden file anonimizado. **C6 e Santander saem** da lista: funcionam só pelo mapeamento manual (C-02).
+- Descartadas: lista do D-030 (Nubank, C6, Santander, BB, Itaú, Bradesco); os 8 bancos.
+- Consequência: os perfis antigos são portados como estão e validados pelos golden files (E-13/E-19). O restante do D-030 (casos especiais, categorias, limites) continua valendo.
+
+### D-049 — Aparelhos de teste: só o OPPO (Android) → plano de testes degradado
+- Data: 28/10/2026 · Status: **proposta** (muda critérios do D-012 e o D-040: precisa do OK do Kaynan)
+- Fato: o único aparelho de teste é o **OPPO CPH2699** (Android 16, ColorOS 16). Não há iPhone, nem Mac (sem simulador de iOS), nem Android de outro fabricante.
+- Proposta:
+  1. **Web/iPhone no dia a dia:** Playwright com **WebKit** (motor do Safari, no Windows) + Chrome desktop + Chrome do OPPO como aproximação. Cobre lógica, OPFS/SharedArrayBuffer, SW e headers, mas **não** substitui o Safari do iOS (instalação na Tela de Início, despejo de dados, `persist()`, Web Share no modo instalado, `.ics` no Calendário, VoiceOver).
+  2. **Fila de verificação do iPhone** (`docs/testes/fila-iphone.md`): todo item "só no iPhone real" de qualquer etapa entra na fila em vez de ficar esquecido.
+  3. **3 janelas de iPhone emprestado** (≈ 30–45 min cada, roteiro escrito, um amigo/familiar com iPhone, idealmente o futuro testador do beta): **J-1** depois da E-07 (instalação, offline, OPFS, medição da E-02); **J-2** depois da E-24 (`.ics` com alarme, faixa, badge); **J-3** antes do beta, na E-40 (backup cruzado, VoiceOver, atualização do PWA).
+  4. **E-02 decide sem iPhone**, com margem de segurança (meta ≤ 1 s nos aproximadores para garantir ≤ 2 s no iPhone), e a decisão fica **provisória até a J-1**.
+  5. **2º fabricante Android:** M-1a de 14 dias só no OPPO antes do beta (ColorOS é a mais agressiva); o 2º fabricante é validado **nas 2 primeiras semanas do beta** por um amigo Android, com roteiro e a tela "Meus alertas…". Emulador (AVD API 29 e 37) para Android 10 e automação, sem contar como fabricante.
+  6. **Se nenhuma janela de iPhone acontecer:** o iPhone entra no beta como **experimental**, com o roteiro de validação executado pelo próprio amigo e backup semanal reforçado.
+- Mudança no D-012 (a confirmar): "lembretes em 2 fabricantes" → OPPO antes do beta + 2º fabricante durante o beta; "iPhone validado no PWA" → validado nas janelas J-1..J-3 (ou no beta, como experimental).
+- Descartadas: nuvem de aparelhos reais (custo/termos; D-043 custo zero); adiar o iPhone para depois do MVP (contraria D-005/D-009).
+
+### D-050 — Lançamento manual de transação (novo PBI C-08)
+- Data: 28/10/2026 · Status: **proposta** (escopo novo: precisa do OK do Kaynan)
+- Contexto: o código antigo tem `transactions/manual.ts` + tela, fora do backlog. O Kaynan pediu para avaliar.
+- Avaliação: **vale a pena**, como PBI pequeno e cortável.
+  - A favor: (1) gasto em **dinheiro vivo** e Pix/débito de bancos sem CSV ficam fora do dashboard sem ele; (2) **familiares mais velhos** (D-009) podem nunca exportar um CSV: o lançamento manual é a porta de entrada mais simples e apoia o critério "usam sem ajuda" (D-012); (3) fecha o ciclo de "Paguei" (A-01) e de "encerrar compra" (L-04) quando o pagamento foi em dinheiro; (4) o código antigo já existe, bem desenhado (hash próprio que não colide com o dedupe do CSV, usa o mesmo motor de categorização, pode pagar uma conta na mesma transação SQL).
+  - Contra: (1) fora do backlog (escopo cresce); (2) **risco de contar 2×**: lançar à mão e depois importar o extrato do mesmo gasto; (3) mais telas para testar nas duas plataformas.
+- Proposta: **C-08 — Lançamento manual de transação**, MVP, **Should**, etapa **E-17b** (depois da correção manual; ~1 sessão). Mitigação da duplicata: conta padrão **"Carteira (dinheiro)"**; ao lançar numa conta que recebe CSV, aviso; na importação, transação manual com mesma conta, mesmo valor e data ±3 dias gera a sugestão "Já lançado à mão? [Juntar]" (com confirmação). Ordem de corte: logo depois de L-05 (posição 1b).
+- Descartadas: deixar de fora (perde os casos acima com custo baixo); entrar como Must (não está no backlog).

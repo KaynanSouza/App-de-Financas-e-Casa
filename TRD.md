@@ -9,9 +9,9 @@
 | Plataforma | Aparelho | Versão do SO | Observação |
 |---|---|---|---|
 | Android (real, principal) | **OPPO CPH2699** (lido via `adb shell getprop`), ABI arm64-v8a | **Android 16 (API 36)**, ColorOS V16.0.0, build CPH2699_16.0.5.1200(EX01) | ColorOS é conhecida por matar processos em segundo plano: aparelho prioritário para testar A-03/A-04. Não tem a opção "Instalar via USB"; a instalação por `adb` pode pedir confirmação na tela. |
-| Android (outros) | ≥ 1 aparelho de **outro fabricante** (amigos) | ≥ Android 10 | Obrigatório para o critério de 14 dias (D-012) e para F-06 (restaurar em outro aparelho). |
+| Android (outros) | **Não disponível** (D-049, proposta): amigo Android de outro fabricante no beta | ≥ Android 10 | Critério de 14 dias em 2 fabricantes (D-012) passa para o beta, se aprovado. |
 | Android (emulador) | AVD `Medium_Phone_API_37.0` (x86_64) | Android API 37 | Só desenvolvimento; não substitui o aparelho real. |
-| iPhone (teste e amigos) | modelos a informar | **iOS 26.x e iOS 18.x** | PWA pelo Safari; mínimo iOS 18 (D-040). O "iOS 16.4+" do SDK 58 vale só para app nativo. |
+| iPhone (teste e amigos) | **Não disponível** (D-049, proposta): Playwright WebKit + janelas J-1..J-3 com iPhone emprestado | **iOS 26.x e iOS 18.x** | PWA pelo Safari; mínimo iOS 18 (D-040). O "iOS 16.4+" do SDK 58 vale só para app nativo. |
 
 ### Máquina de desenvolvimento
 Ver `docs/PROVA-DE-VIDA.md` (Node 24, JDK 17, Android SDK, **CMake 4.1.2**, wrangler).
