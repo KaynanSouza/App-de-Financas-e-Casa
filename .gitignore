@@ -1,0 +1,91 @@
+# ------------------------------------------------------------
+# App de Finanças e Casa — .gitignore
+# Regra: nada de segredo, dado financeiro real ou artefato de build no git.
+# ------------------------------------------------------------
+
+# --- Node / dependências ---
+node_modules/
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+.pnpm-debug.log*
+*.tsbuildinfo
+
+# --- Expo / Metro ---
+.expo/
+.expo-shared/
+expo-env.d.ts
+.metro-health-check*
+web-build/
+
+# --- Builds e saídas (web export, APK/AAB, EAS local) ---
+dist/
+build/
+out/
+*.apk
+*.aab
+*.ipa
+*.app
+*.dSYM.zip
+
+# --- Pastas nativas geradas (CNG / prebuild) ---
+/android
+/ios
+.kotlin/
+.gradle/
+.cxx/
+*.orig.*
+local.properties
+
+# --- Segredos: keystores, certificados, credenciais ---
+*.jks
+*.keystore
+*.p8
+*.p12
+*.key
+*.pem
+*.mobileprovision
+credentials.json
+google-services.json
+GoogleService-Info.plist
+
+# --- Variáveis de ambiente (todas, inclusive .env.example se houver segredo) ---
+.env
+.env.*
+
+# --- Cloudflare / Wrangler (tokens e estado local) ---
+.wrangler/
+.dev.vars
+.dev.vars.*
+.cloudflare/
+*.cf-token*
+
+# --- Dados financeiros reais, dumps e backups (NUNCA versionar) ---
+# CSVs só entram no git dentro de tests/fixtures/ e devem ser SINTÉTICOS.
+*.csv
+!tests/fixtures/**/*.csv
+*.ofx
+*.qfx
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.sqlite-*
+*.sql
+*.dump
+*.bak
+*.backup
+backup/
+backups/
+dumps/
+private/
+
+# --- Logs ---
+*.log
+logs/
+
+# --- Sistema / editor ---
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/

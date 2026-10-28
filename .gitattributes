@@ -1,0 +1,16 @@
+# Line endings normalizados em LF no repositório (Windows-friendly)
+* text=auto eol=lf
+
+# Binários: nunca converter
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+*.jar binary
