@@ -68,7 +68,7 @@ Os arquivos ficam em `public/` e o `expo export` os copia para a raiz de `dist/`
 **Publicado em 28/10/2026** (autorizado pelo Kaynan; login feito por ele): **https://preview.casa-em-dia-44l.pages.dev** (ambiente Preview, commit `102c83f`). Produção **não** publicada.
 - Verificado por `curl`: `/` 200 com o placeholder "Casa em Dia — em construção"; headers de `_headers` aplicados; `x-robots-tag: noindex`; SPA fallback 200; `/index.html` 308 → `/`.
 - O wrangler 4.154 desvia `pages project create` para o Workers e falha; foi preciso usar `--force` uma vez (ver `docs/DEPLOY-CLOUDFLARE.md`).
-- **Pendente (teste manual do Kaynan):** abrir no iPhone (iOS 26 e 18) e no Android; adicionar à Tela de Início; modo avião. Esperado: **não abre offline** (sem service worker) e a instalação vira atalho sem manifest; isso é tarefa futura.
+- **Teste manual do Kaynan (28/10/2026):** roteiro enviado (abrir no iPhone e no Android, adicionar à Tela de Início, modo avião, com a expectativa de **não abrir offline** por falta de service worker). Resposta dele: "está tudo correto". Ele não detalhou resultado por aparelho; considerar confirmado o roteiro com o comportamento esperado.
 
 ## 6. Estratégia de build Android
 | Opção | Como | Custo / requisitos | Prós | Contras |

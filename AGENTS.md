@@ -7,8 +7,8 @@ Projeto pessoal **App de Finanças e Casa (local-first)**. Autor: Kaynan Macedo 
 - Código, nomes de variáveis, arquivos de código, commits, tabelas e colunas do banco em **inglês**.
 
 ## 2. Fluxo de trabalho
-- **Antes de agir:** ler `SESSION.md`, `CONTEXT.md` e o PBI/etapa relacionados (backlog em `docs/backlog-local-first.pdf`; arquitetura atual em `ARCH.md`).
-- **Ao terminar:** atualizar `SESSION.md` (fase, última ação, próximo passo, bloqueios, decisões pendentes).
+- **Antes de agir:** ler `SESSION.md`, `CONTEXT.md` e o PBI/etapa relacionados (backlog em `docs/backlog-local-first.pdf`; arquitetura atual em `ARCH.md`) **e a skill correspondente em `/skills`** (índice em `skills/README.md`; para iniciar PBI, `skills/backlog-pbi`).
+- **Ao terminar:** atualizar `SESSION.md` (fase, última ação, próximo passo, bloqueios, decisões pendentes) e registrar as lições relevantes na skill correspondente, no mesmo commit (ver "Gestão das skills" em `skills/README.md`).
 - **Uma etapa por vez.** Só avançar quando a etapa atual passar nos testes e o humano aprovar.
 - **Ao terminar uma tarefa, reportar:** o que foi feito; o que foi testado; o que **não** foi testado (e em qual plataforma: Android / iPhone-PWA); próximo passo.
 - Decisões de arquitetura ou de escopo vão para `DECISIONS.md` (formato ADR curto), com data.
